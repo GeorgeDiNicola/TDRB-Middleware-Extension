@@ -13,5 +13,5 @@ Column Encryption Record
 Key: Table_name_hash = SHA_256(table_name)
 
 Value:
-	AES(table_name)
-	SHA_256(primary_key_1 + primary_key_2 + ... + primary_key_n)
+	table_name AES(table_name)
+	column_hash = SHA_256(primary_key_1 + primary_key_2 + ... + primary_key_n)
