@@ -125,6 +125,21 @@ if __name__ == '__main__':
 		print(r.owned_table)
 
 
+	cipher_d = AES.new(key, AES.MODE_CBC, iv)
+	#d_data = cipher_d.decrypt(e_data)
+
+	# decrypt the data
+	for r in row_encryption_records:
+		print("===========")
+		print(r.itemID_hash)
+		d_data = cipher_d.decrypt(r.itemID_AES)
+		#plaintext_item_id = cipher.decrypt(r.itemID_AES)
+		print(d_data.decode())
+		d_data_2 = cipher_d.decrypt(r.owned_table)
+		#plaintext_owned_table = cipher.decrypt(r.owned_table)
+		print(d_data_2.decode())
+
+
 	adapter.disconnect()
 
 
