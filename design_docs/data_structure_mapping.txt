@@ -1,0 +1,17 @@
+
+Row Encryption Record
+
+Key: ItemID_Hash = SHA_256(primary key)
+
+Value:
+	ItemID_AES = AES(primary_key)
+	Item_hash = SHA_256(col1 + col2 + col3 + ... coln)
+	Owned_table = AES(table_name)
+
+Column Encryption Record
+
+Key: Table_name_hash = SHA_256(table_name)
+
+Value:
+	AES(table_name)
+	SHA_256(primary_key_1 + primary_key_2 + ... + primary_key_n)
