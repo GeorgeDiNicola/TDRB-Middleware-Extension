@@ -1,0 +1,15 @@
+(MAC)
+
+brew services start mysql [Daemon mode]
+
+mysql.server start  [Not daemon mode]
+
+
+
+brew services stop mysql
+
+mysql.server stop
+
+
+# connect
+mysql -u root -p

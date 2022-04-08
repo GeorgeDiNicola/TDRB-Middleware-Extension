@@ -8,6 +8,8 @@ from Cryptodome.Random import get_random_bytes
 from Cryptodome.Cipher import AES
 
 import config
+import utils
+from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
 
 # settings holds the AES encrypt and decrypt key
@@ -42,6 +44,11 @@ if __name__ == '__main__':
 
 	# query = args.query
 
+
+	adapter = MysqlAdapter("localhost", "students", "root")
+
+	adapter.connect()
+
 	#m = hashlib.sha256()
 
 	#m.update(b"hello")
@@ -54,7 +61,7 @@ if __name__ == '__main__':
 	#data = b'Text to encrypt'   # 15 bytes
 	key = settings["aes_key"]
 	iv = get_random_bytes(16)
-	cipher1 = AES.new(key, AES.MODE_CBC, iv)
+	cipher = AES.new(key, AES.MODE_CBC, iv)
 	#ct = cipher1.encrypt(pad(data, 16))
 
 	# table 1
@@ -68,29 +75,24 @@ if __name__ == '__main__':
 	
 	pk = student_ID[0]
 
-	pk_bytes = str(pk).encode()
-	m = hashlib.sha256()
-	m.update(pk_bytes)
-
-	#print(m.hexdigest())
-	r1_test.itemID_hash = m.hexdigest()
+	r1_test.itemID_hash = utils.SHA_256_conversion(pk)
 
 	# TODO: a later func should check data types
-	r1_test.itemID_AES = cipher1.encrypt(pad(name[0].encode(), 16))
+	r1_test.itemID_AES = utils.AES_conversion(cipher, pk)
 	
-	item = str(student_ID[0]) + sex[0] + age[0]
-	item = item.encode()
-	n = hashlib.sha256()
-	n.update(item)
-	r1_test.item_hash = n.hexdigest()
+	items = [student_ID[0], sex[0], age[0]]
+	r1_test.item_hash = utils.encode_items(items)
 	
-	r1_test.owned_table = cipher1.encrypt(pad(str.encode(table_name), 16))
+	r1_test.owned_table = utils.AES_conversion(cipher, table_name)
 	
 
 	print(r1_test.itemID_hash)
 	print(r1_test.itemID_AES)
 	print(r1_test.item_hash)
 	print(r1_test.owned_table)
+
+
+	adapter.disconnect()
 
 
 	#key = get_random_bytes(32)
