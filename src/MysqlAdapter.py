@@ -31,6 +31,16 @@ class MysqlAdapter():
                 cursor.close()
         except Error as e:
             print("Error while connecting to MySQL", e)
+
+    def send_query(self, q):
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(q)
+                result = cursor.fetchall()
+                return result
+            except Error as e:
+                print("Error while querying MySQL", e)
+
         
     def disconnect(self):
         if self.connection.is_connected():

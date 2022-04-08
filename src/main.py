@@ -44,10 +44,29 @@ if __name__ == '__main__':
 
 	# query = args.query
 
+	select_students_query = "SELECT * FROM student"
+	table_name = "student"
+
 
 	adapter = MysqlAdapter("localhost", "students", "root")
 
 	adapter.connect()
+
+	result = adapter.send_query(select_students_query)
+
+	item_hash_list = []
+	for row in result:
+		temp_list = []
+		for item in row:
+			temp_list.append(item)
+		item_hash_list.append(temp_list)
+
+	print(item_hash_list)
+
+
+	print(table_name)
+	print(len(result))
+	# convert the results into the row_encryption_records
 
 	#m = hashlib.sha256()
 
