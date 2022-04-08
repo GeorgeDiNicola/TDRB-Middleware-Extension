@@ -53,11 +53,8 @@ if __name__ == '__main__':
 
 	data = b'Text to encrypt'   # 15 bytes
 	
-	# TODO HAVE THIS BE A UNIFORM KEY IN THE CONFIG FILE
-	key = get_random_bytes(32)
-	#print(key)
-
-	#b'\x96\xacT\xdfj\xc3\xe8C\x05\xe9\x08=m\x1d\x1c\x00u)<\xcch\xecB\x9c\xde\xda\xe5\xd6Bl\xa6\x91'
+	key = settings["aes_key"]
+	#key = get_random_bytes(32)
 	
 	iv = get_random_bytes(16)
 
