@@ -84,12 +84,24 @@ if __name__ == '__main__':
 	#ct = cipher1.encrypt(pad(data, 16))
 
 	# table 1
-	table_name = 'Student'
-	student_ID = [1, 2, 3]
-	name = ['Alice', 'Bob', 'Peter']
-	sex = ['Female', 'Male', 'Male']
-	age = ["20", "21", "22"]
+	#student_ID = [1, 2, 3]
+	#name = ['Alice', 'Bob', 'Peter']
+	#sex = ['Female', 'Male', 'Male']
+	#age = ["20", "21", "22"]
 
+	row_encryption_records = []
+	
+	for row in item_hash_list:
+		rer_temp = RowEncryptionRecord()
+		pk = row[0]
+		rer_temp.itemID_hash = utils.SHA_256_conversion(pk)
+		rer_temp.itemID_AES = utils.AES_conversion(cipher, pk)
+
+		rer_temp.item_hash = utils.encode_items(row)
+		rer_temp.owned_table = utils.AES_conversion(cipher, table_name)
+		row_encryption_records.append(rer_temp)
+
+	"""
 	r1_test = RowEncryptionRecord()
 	
 	pk = student_ID[0]
@@ -103,12 +115,14 @@ if __name__ == '__main__':
 	r1_test.item_hash = utils.encode_items(items)
 	
 	r1_test.owned_table = utils.AES_conversion(cipher, table_name)
-	
+	"""
 
-	print(r1_test.itemID_hash)
-	print(r1_test.itemID_AES)
-	print(r1_test.item_hash)
-	print(r1_test.owned_table)
+	for r in row_encryption_records:
+		print("===========")
+		print(r.itemID_hash)
+		print(r.itemID_AES)
+		print(r.item_hash)
+		print(r.owned_table)
 
 
 	adapter.disconnect()
