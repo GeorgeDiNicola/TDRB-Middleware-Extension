@@ -4,12 +4,15 @@ from Cryptodome.Random import get_random_bytes
 from Cryptodome.Cipher import AES
 
 def convert_relational_to_row_encyption_record():
+	
 	# key -> value
 	pass
 
 def convert_relational_to_column_encyption_record():
 	# key -> value
 	pass
+
+
 
 
 def encode_items(item_list):

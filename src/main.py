@@ -9,6 +9,7 @@ from Cryptodome.Cipher import AES
 
 import config
 import utils
+import sql as s
 from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
 
@@ -44,8 +45,9 @@ if __name__ == '__main__':
 
 	# query = args.query
 
-	select_students_query = "SELECT * FROM student"
+	
 	table_name = "student"
+	select_students_query = s.SELECT_STUDENT_QUERY
 
 
 	adapter = MysqlAdapter("localhost", "students", "root")
@@ -91,6 +93,8 @@ if __name__ == '__main__':
 
 	row_encryption_records = []
 	
+	# TODO: the below will go in the tampering detection module
+	#  and the conversion for the actual push to the blockchain
 	for row in item_hash_list:
 		rer_temp = RowEncryptionRecord()
 		pk = row[0]
@@ -98,31 +102,16 @@ if __name__ == '__main__':
 		rer_temp.itemID_AES = utils.AES_conversion(cipher, pk)
 
 		rer_temp.item_hash = utils.encode_items(row)
-		rer_temp.owned_table = utils.AES_conversion(cipher, table_name)
+		rer_temp.owned_table_AES = utils.AES_conversion(cipher, table_name)
 		row_encryption_records.append(rer_temp)
 
-	"""
-	r1_test = RowEncryptionRecord()
-	
-	pk = student_ID[0]
-
-	r1_test.itemID_hash = utils.SHA_256_conversion(pk)
-
-	# TODO: a later func should check data types
-	r1_test.itemID_AES = utils.AES_conversion(cipher, pk)
-	
-	items = [student_ID[0], sex[0], age[0]]
-	r1_test.item_hash = utils.encode_items(items)
-	
-	r1_test.owned_table = utils.AES_conversion(cipher, table_name)
-	"""
 
 	for r in row_encryption_records:
 		print("===========")
 		print(r.itemID_hash)
 		print(r.itemID_AES)
 		print(r.item_hash)
-		print(r.owned_table)
+		print(r.owned_table_AES)
 
 
 	cipher_d = AES.new(key, AES.MODE_CBC, iv)
@@ -132,12 +121,9 @@ if __name__ == '__main__':
 	for r in row_encryption_records:
 		print("===========")
 		print(r.itemID_hash)
-		d_data = cipher_d.decrypt(r.itemID_AES)
-		#plaintext_item_id = cipher.decrypt(r.itemID_AES)
-		print(d_data.decode())
-		d_data_2 = cipher_d.decrypt(r.owned_table)
-		#plaintext_owned_table = cipher.decrypt(r.owned_table)
-		print(d_data_2.decode())
+		print(r.get_unencrypted_itemID(key, iv))
+		print(r.item_hash)
+		print(r.get_unencrypted_owned_table(key, iv))
 
 
 	adapter.disconnect()
