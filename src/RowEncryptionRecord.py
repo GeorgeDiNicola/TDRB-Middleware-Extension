@@ -19,6 +19,7 @@ class RowEncryptionRecord():
 	def get_unencrypted_owned_table(self, key, iv):
 		d_cipher = AES.new(key, AES.MODE_CBC, iv)
 		# TODO: decrypt self.owned_table_AES
+		d_data = d_cipher.decrypt(self.owned_table_AES)
 		return d_data.decode()
 	"""
 	

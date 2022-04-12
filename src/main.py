@@ -12,6 +12,7 @@ import utils
 import sql as s
 from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
+from ColumnEncryptionRecord import ColumnEncryptionRecord
 
 # settings holds the AES encrypt and decrypt key
 settings = config.load_config()
@@ -79,6 +80,9 @@ if __name__ == '__main__':
 	#print(m.digest_size)
 	#print(m.block_size)
 
+
+	# row encryption records
+
 	#data = b'Text to encrypt'   # 15 bytes
 	key = settings["aes_key"]
 	iv = get_random_bytes(16)
@@ -121,9 +125,29 @@ if __name__ == '__main__':
 	for r in row_encryption_records:
 		print("===========")
 		print(r.itemID_hash)
-		print(r.get_unencrypted_itemID(key, iv))
+		#print(r.get_unencrypted_itemID(key, iv))
 		print(r.item_hash)
-		print(r.get_unencrypted_owned_table(key, iv))
+		# TODO: fix the below
+		#print(r.get_unencrypted_owned_table(key, iv))
+
+
+
+	# column encryption records
+	pks = []
+	for row in item_hash_list:
+		pks.append(row[0])
+	
+	print("===== Column E Record=====")
+	cer = ColumnEncryptionRecord()
+	cer.table_name_hash = utils.SHA_256_conversion(pk)
+	cer.aes_table_name = utils.AES_conversion(cipher, pk)
+	cer.column_hash = utils.encode_items(pks)
+
+	print(cer.table_name_hash)
+	print(cer.aes_table_name)
+	print(cer.column_hash)
+
+	print(cer.get_unencrypted_table_name(key, iv))
 
 
 	adapter.disconnect()
