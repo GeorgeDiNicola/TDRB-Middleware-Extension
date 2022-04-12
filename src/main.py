@@ -65,6 +65,8 @@ if __name__ == '__main__':
 
 	td.cerc(table_list, adapter, key, iv)
 
+	td.rerc(table_name, adapter, key, iv)
+
 	"""
 	result = adapter.send_query(select_students_query)
 

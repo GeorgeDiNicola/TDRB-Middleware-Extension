@@ -33,13 +33,33 @@ def get_column_hash(results):
 
 def get_encrypted_table(table_name, key, iv):
 	cipher = AES.new(key, AES.MODE_CBC, iv)
-	data = str(table_name)  # ensure table name is a string
-	return cipher.encrypt(pad(data.encode(), 16))
+	table_name_str = str(table_name)  # ensure table name is a string before conversion
+	return cipher.encrypt(pad(table_name_str.encode(), 16))
 
 
 def get_table_name_hash(table_name):
-	str_table_name = str(table_name)  # ensure table name is string
+	str_table_name = str(table_name)  # ensure table name is string before conversion
 	return utils.SHA_256_conversion(str_table_name)
+
+
+def get_item_id_hash(item_id):
+	str_item_id = str(item_id)  # ensure item ID is string before conversion
+	return utils.SHA_256_conversion(str_item_id)
+
+
+def get_item_hash(row):
+	# concatenate the hash for each column EXCEPT the primary key
+	concatenated_items = ""
+	for column in row[1:]:
+		concatenated_items += str(column)  # ensure the column is string before conversion
+	return utils.SHA_256_conversion(concatenated_items)
+
+
+def get_encrypted_item_id(item_id, key, iv):
+	cipher = AES.new(key, AES.MODE_CBC, iv)
+	item_id_str = str(item_id)  # ensure table name is a string before conversion
+	return cipher.encrypt(pad(item_id_str.encode(), 16))
+
 
 # column encryption record comparison
 def cerc(table_list, adapter, key, iv):
@@ -65,9 +85,9 @@ def cerc(table_list, adapter, key, iv):
 		table_name_aes = get_encrypted_table(table_name, key, iv)
 		table_name_hash = get_table_name_hash(table_name)
 
-		print(column_hash)
-		print(table_name_aes)
-		print(table_name_hash)
+		#print(column_hash)
+		#print(table_name_aes)
+		#print(table_name_hash)
 
 		# query_column_hash, redis_flag = access_redis(table_name_hash)
 
@@ -96,3 +116,25 @@ def cerc(table_list, adapter, key, iv):
 
 	return tamper_information, table  # table = query results
 	"""
+
+# row encryption record comparison
+def rerc(table_name, adapter, key, iv):
+	""" """
+	query = "select * from " + table_name  # construct the query for getting the data from the table
+	results = adapter.send_query(query)
+	
+	for row in results:
+		item_id = row[0]
+		item_id_hash = get_item_id_hash(item_id)
+		item_hash = get_item_hash(row)
+		item_id_aes = get_encrypted_item_id(item_id, key, iv)
+		owned_table_aes = get_encrypted_table(table_name, key, iv)
+		print(item_id_hash)
+		print(item_hash)
+		print(item_id_aes)
+		print(owned_table_aes)
+
+
+
+
+
