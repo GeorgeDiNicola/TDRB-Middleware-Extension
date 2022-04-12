@@ -91,6 +91,7 @@ def cerc(table_list, adapter, key, iv):
 
 		# query_column_hash, redis_flag = access_redis(table_name_hash)
 
+	# redis_flag represents cache hit (1) or cache miss (0)
 	"""
 		if column_hash != query_column_hash:
 			if redis_flag == 0:
@@ -129,11 +130,27 @@ def rerc(table_name, adapter, key, iv):
 		item_hash = get_item_hash(row)
 		item_id_aes = get_encrypted_item_id(item_id, key, iv)
 		owned_table_aes = get_encrypted_table(table_name, key, iv)
+		# query_item_hash, redis_flag = access_redis(item_id_hash)
 		print(item_id_hash)
 		print(item_hash)
 		print(item_id_aes)
 		print(owned_table_aes)
 
+	
+	"""
+		if item_hash != query_item_hash:
+			if redis_flag == 0:
+				tamper_flag = 1
+				# WHY PUSH? ARE ILLEGAL_MODIFY, INSERT, AND DELETE STACKS????
+				illegal_modify.push(Decrypt(item_id, owned_table_aes))
+			else:
+				clear Redis
+				get query_item_hash from Blockchain
+				if item_hash != query_item_hash:
+					tamper_flag = 1
+					illegal_modify.push(Decrypt(item_id, owned_table_aes))
+	return tamper_flag
+	"""
 
 
 
