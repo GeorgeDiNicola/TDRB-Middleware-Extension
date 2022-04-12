@@ -1,0 +1,101 @@
+# run the following command to remove any containers or artifacts from any previous runs:
+
+./network.sh down
+
+
+# bring up the network
+# This command creates a Fabric network that consists of two peer nodes, one ordering node. 
+
+./network.sh up
+
+
+# examine the components of the test network
+docker ps -a
+
+
+
+# Creating a channel
+
+# create a Fabric channel for transactions between Org1 and Org2
+# Run the following command to create a channel with the default name of mychannel
+
+./network.sh createChannel
+
+
+# You can also use the channel flag to create a channel with custom name.
+#  As an example, the following command would create a channel named channel1:
+
+./network.sh createChannel -c channel1
+
+
+# The channel flag also allows you to create multiple channels by specifying different channel names. After you create mychannel or channel1, you can use #  the command below to create a second channel named channel2:
+
+./network.sh createChannel -c channel2
+
+
+# If you want to bring up the network and create a channel in a single step, you can use the up and createChannel modes together:
+
+./network.sh up createChannel
+
+
+#you can start a chaincode on the channel using the # following command: (after channel creation)
+
+./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go
+
+
+# Run the following command to initialize the ledger with assets. (Note the CLI does not access the Fabric Gateway peer, so each endorsing peer must be specified.)
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c '{"function":"InitLedger","Args":[]}'
+
+
+# Query the ledger from the command line
+
+peer chaincode query -C mychannel -n basic -c '{"Args":["GetAllAssets"]}'
+
+
+# Use the following command to change the owner of an asset on the ledger by invoking the asset-transfer (basic) chaincode:
+# Because the endorsement policy for the asset-transfer (basic) chaincode requires the transaction to be signed by Org1 and Org2, the chaincode invoke command needs to target both peer0.org1.example.com and peer0.org2.example.com using the --peerAddresses flag. Because TLS is enabled for the network, the command also needs to reference the TLS certificate for each peer using the --tlsRootCertFiles flag.
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c '{"function":"TransferAsset","Args":["asset6","Christopher"]}'
+
+
+
+# create the chaincode package using the peer lifecycle chaincode package command
+peer lifecycle chaincode package basic.tar.gz --path ../asset-transfer-basic/chaincode-go/ --lang golang --label basic_1.0
+
+
+# Approve the chaincode definition using the peer lifecycle chaincode approveformyorg command:
+
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name basic --version 1.0 --package-id $CC_PACKAGE_ID --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+
+# approve the chaincode definition for an org (org1 in this)
+
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name basic --version 1.0 --package-id $CC_PACKAGE_ID --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+
+# use the peer lifecycle chaincode checkcommitreadiness command to check whether channel members have approved the same chaincode definition
+
+peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --output json
+
+
+# commit transaction on behalf of org admin
+
+peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
+
+
+# use the peer lifecycle chaincode querycommitted command to confirm that the chaincode definition has been committed to the channel
+
+peer lifecycle chaincode querycommitted --channelID mychannel --name basic --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+
+
+# Use the following command to create an initial set of assets on the ledger. Note that the invoke command needs to target a sufficient number of peers to meet the chaincode endorsement policy.
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c '{"function":"InitLedger","Args":[]}'
+
+
+# use a query function to read the set of cars that were created by the chaincode
+
+peer chaincode query -C mychannel -n basic -c '{"Args":["GetAllAssets"]}'
+
+
