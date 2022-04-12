@@ -42,36 +42,52 @@ def get_table_name_hash(table_name):
 	return utils.SHA_256_conversion(str_table_name)
 
 # column encryption record comparison
-def cerc(adapter, query, key, table_name, iv):
+def cerc(table_list, adapter, key, iv):
+	""" Get all DB tables involved in the original query statement and
+	query all the data in each table. Calculate the column encryption
+	record according to the TDRB middleware study. """
+	
 	tamper_flag = 0
 	
-	#tables = get_query_tables(query)
-	table = adapter.send_query(query)
-
+	tables = []
 	# TODO: ADD SOME MECHANISM TO ACTUALLY ITERATE OVER TABLES INSTEAD OF ROWS
-	column_hash = get_column_hash(table)
-	table_name_aes = get_encrypted_table(table_name, key, iv)
-	table_name_hash = get_table_name_hash(table_name)
+	for table_name in table_list:
+		
+		query = "select * from " + table_name  # construct the query for getting the data from the table
 
-	# query_column_hash, redis_flag = access_redis(table_name_hash)
+		results = adapter.send_query(query)
 
-	
-	if column_hash != query_column_hash:
-		if redis_flag == 0:
-			tamper_flag = 1
-			#b_tabes = rich_query_blockchain_(table)   send query to get blockchain records
-			r_tables = get_all_row_encryption_records(table)
-			illegal_insert, illegal_delete, illegal_modify = check_tamper(b_tables, r_tables)
-		else:
-			clear Redis
-			get query_column_hash from Blockchain
-			if column_hash != query_column_hash:
+		column_hash = get_column_hash(results)
+
+		table_name_aes = get_encrypted_table(table_name, key, iv)
+
+		column_hash = get_column_hash(results)
+		table_name_aes = get_encrypted_table(table_name, key, iv)
+		table_name_hash = get_table_name_hash(table_name)
+
+		print(column_hash)
+		print(table_name_aes)
+		print(table_name_hash)
+
+		# query_column_hash, redis_flag = access_redis(table_name_hash)
+
+	"""
+		if column_hash != query_column_hash:
+			if redis_flag == 0:
 				tamper_flag = 1
-				#b_tables = rich_query_blockchain_(table)  # send query to get blockchain records
+				#b_tabes = rich_query_blockchain_(table)   send query to get blockchain records
 				r_tables = get_all_row_encryption_records(table)
 				illegal_insert, illegal_delete, illegal_modify = check_tamper(b_tables, r_tables)
 			else:
-				tamper_flag = check_tamper(b_tables, r_tables)
+				clear Redis
+				get query_column_hash from Blockchain
+				if column_hash != query_column_hash:
+					tamper_flag = 1
+					#b_tables = rich_query_blockchain_(table)  # send query to get blockchain records
+					r_tables = get_all_row_encryption_records(table)
+					illegal_insert, illegal_delete, illegal_modify = check_tamper(b_tables, r_tables)
+				else:
+					tamper_flag = check_tamper(b_tables, r_tables)
 	if tamper_flag == 0:
 		return table  # return the query results from the relational DB
 	else:
@@ -79,3 +95,4 @@ def cerc(adapter, query, key, table_name, iv):
 		print(tamper_information)
 
 	return tamper_information, table  # table = query results
+	"""

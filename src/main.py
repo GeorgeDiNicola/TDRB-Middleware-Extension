@@ -49,6 +49,7 @@ if __name__ == '__main__':
 
 	
 	table_name = "student"
+	table_list = ["student"]
 	select_students_query = s.SELECT_STUDENT_QUERY
 
 
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 
-	td.cerc(adapter, select_students_query, key, table_name, iv)
+	td.cerc(table_list, adapter, key, iv)
 
 	"""
 	result = adapter.send_query(select_students_query)
