@@ -9,6 +9,7 @@ from Cryptodome.Cipher import AES
 
 import config
 import utils
+import tamper_detection as td
 import sql as s
 from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
@@ -55,6 +56,15 @@ if __name__ == '__main__':
 
 	adapter.connect()
 
+	key = settings["aes_key"]
+	iv =  settings["iv"]
+	#iv = get_random_bytes(16)
+
+	cipher = AES.new(key, AES.MODE_CBC, iv)
+
+	td.cerc(adapter, select_students_query, key, table_name, iv)
+
+	"""
 	result = adapter.send_query(select_students_query)
 
 	item_hash_list = []
@@ -148,6 +158,7 @@ if __name__ == '__main__':
 	print(cer.column_hash)
 
 	print(cer.get_unencrypted_table_name(key, iv))
+	"""
 
 
 	adapter.disconnect()
