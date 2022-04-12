@@ -10,6 +10,7 @@ from Cryptodome.Cipher import AES
 import setup
 import config
 import utils
+import blockchain
 import tamper_detection as td
 import sql as s
 from MysqlAdapter import MysqlAdapter
