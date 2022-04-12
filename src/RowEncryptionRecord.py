@@ -6,8 +6,8 @@ from Cryptodome.Cipher import AES
 class RowEncryptionRecord():
 
 	def __init__(self):
-		self.itemID_hash = None
-		self.itemID_AES = None
+		self.item_id_hash = None
+		self.item_id_AES = None
 		self.item_hash = None
 		self.owned_table_AES = None
 	

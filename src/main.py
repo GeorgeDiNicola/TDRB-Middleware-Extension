@@ -7,6 +7,7 @@ from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.Cipher import AES
 
+import setup
 import config
 import utils
 import tamper_detection as td
@@ -50,22 +51,54 @@ if __name__ == '__main__':
 	
 	table_name = "student"
 	table_list = ["student"]
+	database = settings["database"]
+	username = settings["username"]
+	host_name = settings["host_name"]
+
 	select_students_query = s.SELECT_STUDENT_QUERY
 
 
-	adapter = MysqlAdapter("localhost", "students", "root")
+	adapter = MysqlAdapter(host_name, database, username)
 
 	adapter.connect()
 
 	key = settings["aes_key"]
 	iv =  settings["iv"]
+	cipher = AES.new(key, AES.MODE_CBC, iv)
 	#iv = get_random_bytes(16)
 
-	cipher = AES.new(key, AES.MODE_CBC, iv)
 
-	td.cerc(table_list, adapter, key, iv)
+	col_encryption_rec = setup.convert_table_to_column_encryption_record(adapter, table_name)
+	row_encryption_recs = setup.convert_table_to_record_encryption_records(adapter, table_name)
 
-	td.rerc(table_name, adapter, key, iv)
+	all_tables = utils.get_all_database_tables(adapter, database)
+	for table_name in all_tables:
+		print(table_name)
+	"""
+	print("\n====Column Encryption Record====\n")
+	print(col_encryption_rec.table_name_hash)
+	print(col_encryption_rec.table_name_AES)
+	print(col_encryption_rec.column_hash)
+	print("==============================\n")
+
+	print("====Row Encryption Records====\n")
+	i = 1
+	for rer in row_encryption_recs:
+		print("record :", i)
+		print(rer.item_id_hash)
+		print(rer.item_id_AES)
+		print(rer.item_hash)
+		print(rer.owned_table_AES)
+		i += 1
+	"""
+
+	# update students set age = years_old
+	#insert into students(id, name, age) values (4, "james", 49)
+	# create table student(student_id INT NOT NULL,name VARCHAR(25) NOT NULL,sex VARCHAR(25) NOT NULL,age INT NOT NULL,PRIMARY KEY ( student_id ));
+
+	#td.cerc(table_list, adapter, key, iv)
+
+	#td.rerc(table_name, adapter, key, iv)
 
 	"""
 	result = adapter.send_query(select_students_query)
