@@ -13,8 +13,7 @@ class ColumnEncryptionRecord():
 	def get_unencrypted_table_name(self, key, iv):
 		d_cipher = AES.new(key, AES.MODE_CBC, iv)
 		d_data = d_cipher.decrypt(self.table_name_AES)
-		# TODO: decrypt self.owned_table_AES
-		return d_data
+		return d_data.decode()
 	
 	"""
 	def __init__(self, table_name_hash, table_name_AES, column_hash):

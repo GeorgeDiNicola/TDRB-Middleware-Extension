@@ -13,10 +13,10 @@ class RowEncryptionRecord():
 	
 	def get_unencrypted_itemID(self, key, iv):
 		d_cipher = AES.new(key, AES.MODE_CBC, iv)
-		d_data = d_cipher.decrypt(self.itemID_AES)
+		d_data = d_cipher.decrypt(self.item_id_AES)
 		return d_data.decode()
 
-	def get_unencrypted_owned_table(self, key, iv):
+	def get_unencrypted_table_name(self, key, iv):
 		d_cipher = AES.new(key, AES.MODE_CBC, iv)
 		# TODO: decrypt self.owned_table_AES
 		d_data = d_cipher.decrypt(self.owned_table_AES)

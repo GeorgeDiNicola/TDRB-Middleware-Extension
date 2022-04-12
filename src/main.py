@@ -74,6 +74,26 @@ if __name__ == '__main__':
 	all_tables = utils.get_all_database_tables(adapter, database)
 	for table_name in all_tables:
 		print(table_name)
+
+
+	# read the original records
+	print("\n====Column Encryption Record====\n")
+	print(col_encryption_rec.table_name_hash)
+	print(col_encryption_rec.get_unencrypted_table_name(key, iv))
+	print(col_encryption_rec.column_hash)
+	print("==============================\n")
+
+	print("====Row Encryption Records====\n")
+	i = 1
+	for rer in row_encryption_recs:
+		print("record :", i)
+		print(rer.item_id_hash)
+		print(rer.get_unencrypted_itemID(key, iv))
+		print(rer.item_hash)
+		print(rer.get_unencrypted_table_name(key, iv))
+		i += 1
+
+	adapter.disconnect()
 	"""
 	print("\n====Column Encryption Record====\n")
 	print(col_encryption_rec.table_name_hash)
@@ -195,9 +215,6 @@ if __name__ == '__main__':
 
 	print(cer.get_unencrypted_table_name(key, iv))
 	"""
-
-
-	adapter.disconnect()
 
 
 	#key = get_random_bytes(32)
