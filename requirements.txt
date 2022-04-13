@@ -5,6 +5,7 @@ charset-normalizer==2.0.12
 CouchDB==1.2
 cryptography==36.0.2
 distlib==0.3.4
+fabric-sdk-py==0.9.0
 filelock==3.6.0
 grpcio==1.44.0
 hkdf==0.0.3
