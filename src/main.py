@@ -15,6 +15,7 @@ import config
 import utils
 import tamper_detection as td
 import sql as s
+import blockchain
 from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord
@@ -29,7 +30,13 @@ def handle_user_args():
 	parser = argparse.ArgumentParser(description='TDRB Middleware extension Argument Parser')
 
 	parser.add_argument('--q', dest='query', required=True, type=str,
-		nargs='+', help='Query for the middleware to sent to the relational database')
+		nargs='+', help='Query for the middleware to send to the relational database')
+	#parser.add_argument('--t', dest='table', required=True, type=str,
+	#	nargs='+', help='Table involved in the query')
+	parser.add_argument('--c', dest='command', required=True, type=str,
+		nargs='+', help='Command (insert, delete, update, query')
+	parser.add_argument('--r', dest='row_to_insert', required=False, type=str,
+		nargs='+', help='Command (insert, delete, update, query')
 
 	args = parser.parse_args()
 
@@ -37,51 +44,150 @@ def handle_user_args():
 	if len(args.query) < 1:
 		raise argparse.ArgumentTypeError("The query must not be empty!")
 
-	# how to handle spaces in args: 
-	# https://stackoverflow.com/questions/18157376/handle-spaces-in-argparse-input
+	# handles spaces in the arguments
 	space = ' '
 	args.query = space.join(args.query)
+	args.command = space.join(args.command)
 
 	return args
 
 
+
+def update():
+	pass
+
+
+def delete():
+	pass
+
+
+# implement second
+
+def insert(user_query, adapter, new_row, table_name, key, iv):
+	# NOTE: user MUST specify a primary key!!!!
+	# do the DB FIRST! so if the query the user sent is no good it isn't added to the db
+	
+	# send the user's insert sql command to the DB
+	#result = adapter.send_query(user_query)
+
+	# send to blockchain
+	new_row_id = new_row[0]
+	new_itemID_hash = utils.get_item_id_hash(new_row_id)
+	new_itemID_AES = utils.get_encrypted_item_id(new_row_id, key, iv)
+	new_item_hash = utils.get_item_hash_pk_present(new_row)
+	new_item_table_AES = utils.get_encrypted_table(table_name, key, iv)
+
+	
+	
+
+
+# implement first
+def query(user_query, adapter):
+	
+	# send the user's query to the DB
+	query_results = adapter.send_query(user_query)
+
+	# print the results
+	print(query_results)
+
+
+
+
 if __name__ == '__main__':
 
-	# args = handle_user_args()
+	args = handle_user_args()
 
-	# query = args.query
+	user_query = args.query
+	user_command = args.command
+	row_to_insert = args.row_to_insert
 
 	
 	table_name = "student"
-	table_list = ["student"]
+	#table_list = ["student"]
 	database = settings["database"]
 	username = settings["username"]
 	host_name = settings["host_name"]
-	p = "root"
-
-	print(database)
-	print(username)
-	print(host_name)
-
-	select_students_query = s.SELECT_STUDENT_QUERY
+	p = settings["password"]
 
 
 	adapter = MysqlAdapter(host_name, database, username, p)
-
-
 	adapter.connect()
+
+
+	# for table in list_of_sql_tables:
+	query_for_tamper_check = "select * from " + table_name  # construct the query for getting the data from the table
+	results = adapter.send_query(query_for_tamper_check)
+
 
 	key = settings["aes_key"]
 	iv =  settings["iv"]
-	cipher = AES.new(key, AES.MODE_CBC, iv)
 	#iv = get_random_bytes(16)
+	cipher = AES.new(key, AES.MODE_CBC, iv)
+	
+
+	# get the column encryption records and row encryption records for the database table
+	col_encryption_rec = setup.convert_table_to_column_encryption_record(results, table_name)
+	row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
+
+	# read the encrypted records
+	print("\n====Column Encryption Record====\n")
+	print(col_encryption_rec.table_name_hash)
+	print(col_encryption_rec.table_name_AES)
+	print(col_encryption_rec.column_hash)
+	print("==============================\n")
+
+	print("====Row Encryption Records====\n")
+	i = 1
+	for rer in row_encryption_recs:
+		print("record :", i)
+		print(rer.item_id_hash)
+		print(rer.item_id_AES)
+		print(rer.item_hash)
+		print(rer.owned_table_AES)
+		i += 1
 
 
-	col_encryption_rec = setup.convert_table_to_column_encryption_record(adapter, table_name)
-	row_encryption_recs = setup.convert_table_to_record_encryption_records(adapter, table_name)
+	# detect illegal modification step
+	#rerc_tamper_flag = td.rerc(table_name, adapter, key, iv)
+	rerc_tamper_flag = 0
+
+	# detect illegal insert or delete step
+	#cerc_tamper_flag td.cerc(table_name, adapter, key, iv)
 
 
-	# detect illegal modification
+	if rerc_tamper_flag:
+		# return tamper information
+		print("TAMPERING INFO: the data has been tampered with")
+
+	#if cerc_tamper_flag:
+		# return tamper information
+		#print("TAMPERING INFO: the data has been tampered with")
+
+	
+	# data not tampered with
+
+	# handle the user's query when no detection
+	if user_command == "query":
+		query(user_query, adapter)
+	elif user_command == "insert":
+		insert(user_query, adapter, row_to_insert, table_name, key, iv)
+
+
+
+	# disconnect from database
+	adapter.disconnect()
+
+
+	# add all of the row encryption records to the blockchain:
+
+	#for rer in row_encryption_recs:
+	#	print(rer)
+	#	blockchain.create_blockchain_record(rer.item_id_hash, rer.item_id_AES, rer.item_hash, rer.owned_table_AES)
+
+
+
+
+	
 
 	# read the original records
 	"""
@@ -103,8 +209,7 @@ if __name__ == '__main__':
 	"""
 
 
-	# detect step
-	td.rerc(table_name, adapter, key, iv)
+	
 
 
 	# read the ENCRYPTED records
@@ -125,8 +230,6 @@ if __name__ == '__main__':
 		print(rer.owned_table_AES)
 		i += 1
 	"""
-
-	adapter.disconnect()
 
 
 	#all_tables = utils.get_all_database_tables(adapter, database)

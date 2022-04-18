@@ -42,7 +42,7 @@ def get_item_id_hash(item_id):
 	return SHA_256_conversion(str_item_id)
 
 
-def get_item_hash(row):
+def get_item_hash_pk_present(row):
 	# concatenate the hash for each column EXCEPT the primary key
 	concatenated_items = ""
 	for column in row[1:]:  # skip the primary key (1st column)

@@ -4,12 +4,12 @@ from mysql.connector import Error
 
 class MysqlAdapter():
 
-    def __init__(self, host, db, user):
+    def __init__(self, host, db, user, password):
         self.connection = None
         self.host = host
         self.database = db
         self.user = user
-        #self.password = password
+        self.password = password
 
     # ref: https://realpython.com/python-mysql/
     def connect(self):
@@ -18,8 +18,8 @@ class MysqlAdapter():
             self.connection = mysql.connector.connect(
                 host=self.host,
                 database=self.database,
-                user=self.user#,
-                #password=self.password
+                user=self.user,
+                password=self.password
             )
             if self.connection.is_connected():
                 db_Info = self.connection.get_server_info()
