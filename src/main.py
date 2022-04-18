@@ -65,12 +65,16 @@ def delete():
 
 def insert(user_query, adapter, new_row, table_name, key, iv):
 	# NOTE: user MUST specify a primary key!!!!
-	# do the DB FIRST! so if the query the user sent is no good it isn't added to the db
 	
 	# send the user's insert sql command to the DB
-	#result = adapter.send_query(user_query)
+	result = adapter.send_query(user_query)
+	print("insert to the db result")
+	print(result)
 
-	# send to blockchain
+	# send to blockchain if the DB statement was valid and worked
+	if not result:
+		return False
+	
 	new_row_id = new_row[0]
 	new_itemID_hash = utils.get_item_id_hash(new_row_id)
 	new_itemID_AES = utils.get_encrypted_item_id(new_row_id, key, iv)
