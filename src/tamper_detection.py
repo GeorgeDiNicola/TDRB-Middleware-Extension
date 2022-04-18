@@ -19,7 +19,7 @@ from ColumnEncryptionRecord import ColumnEncryptionRecord
 from MysqlAdapter import MysqlAdapter
 
 
-
+from subprocess import check_output
 
 
 # column encryption record comparison
@@ -82,6 +82,8 @@ def cerc(table_list, adapter, key, iv):
 # row encryption record comparison
 def rerc(table_name, adapter, key, iv):
 	""" """
+
+	tamper_flag = 0  # zero indicates no tampering
 	query = "select * from " + table_name  # construct the query for getting the data from the table
 	results = adapter.send_query(query)
 	
@@ -91,28 +93,30 @@ def rerc(table_name, adapter, key, iv):
 		item_hash = utils.get_item_hash(row)
 		item_id_aes = utils.get_encrypted_item_id(item_id, key, iv)
 		owned_table_aes = utils.get_encrypted_table(table_name, key, iv)
-		# query_item_hash, redis_flag = access_redis(item_id_hash)
 		print(item_id_hash)
 		print(item_hash)
 		print(item_id_aes)
 		print(owned_table_aes)
 
-	
-	"""
-		if item_hash != query_item_hash:
-			if redis_flag == 0:
-				tamper_flag = 1
-				# WHY PUSH? ARE ILLEGAL_MODIFY, INSERT, AND DELETE STACKS????
-				illegal_modify.push(Decrypt(item_id, owned_table_aes))
-			else:
-				clear Redis
-				get query_item_hash from Blockchain
-				if item_hash != query_item_hash:
-					tamper_flag = 1
-					illegal_modify.push(Decrypt(item_id, owned_table_aes))
-	return tamper_flag
-	"""
 
+		blockchain_result = check_output(['node', 'query.js', item_id_hash])
+		
+		if item_hash not in str(blockchain_result):
+			print("tampering detected: ILLEGAL MODIFICATION")
+			print(blockchain_result)
+			tamper_flag = 1
+		
+		# if fail, try to query one more time
+		#if "Failed to evaluate transaction" in blockchain_result:
+		#	print("query failed")
+
+		# use item_id_hash CHECK THE BLOCKCHAIN!
+		# query_item_hash = blockchain_query(item_id_hash)
+		# if item_hash != query_item_hash:
+		#   illegal_modify.push(Decrypt(item_id, owned_table_aes))   PK and tablename modified
+		#	tamper_flag = 1
+
+	return tamper_flag
 
 
 
