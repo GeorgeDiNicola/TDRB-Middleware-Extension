@@ -1,0 +1,55 @@
+0. Get correct version of the repository and docker images
+
+curl -sSL https://bit.ly/2ysbOFE | bash -s -- 1.4.0 1.5.2
+
+
+1. switch to base folder
+
+cd fabric-samples/test-network
+
+2. bring up the network and create channel
+
+./network.sh up createChannel -c channel1 -ca
+
+
+3. install default Chaincode - asset-transfer (basic) chaincode
+
+cd ../asset-transfer-basic/chaincode-javascript
+
+npm install
+
+cd ../../test-network
+
+
+# set bin path for the "peer command" FROM WITHIN fabric-samples directory!
+# note: if incorrect, "peer" command cannot be found!
+#export PATH=<path to download location>/bin:$PATH
+
+export FABRIC_CFG_PATH=$PWD/config/  
+
+export PATH=/Users/georgedinicola/Desktop/fabric-samples/bin:$PATH
+
+
+peer lifecycle chaincode package basic.tar.gz --path ../asset-transfer-basic/chaincode-javascript/ --lang node --label basic_1.0
+
+
+
+4. Install 1 peer0 Org1
+
+./scripts/envVar.sh
+
+setGlobals 1
+
+peer lifecycle chaincode install basic.tar.gz
+
+
+5. install 1 peer0 Org@
+
+setGlobals 2
+peer lifecycle chaincode install basic.tar.gz
+
+
+6. check installed chaincode and get PKID
+
+setGlobals 1
+peer lifecycle chaincode queryIntelled --peerAddresses localhost:7051 --tlsRootCertFiles organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt

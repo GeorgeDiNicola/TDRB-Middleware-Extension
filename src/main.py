@@ -10,7 +10,6 @@ from Cryptodome.Cipher import AES
 import setup
 import config
 import utils
-import blockchain
 import tamper_detection as td
 import sql as s
 from MysqlAdapter import MysqlAdapter
@@ -78,6 +77,7 @@ if __name__ == '__main__':
 
 
 	# read the original records
+	"""
 	print("\n====Column Encryption Record====\n")
 	print(col_encryption_rec.table_name_hash)
 	print(col_encryption_rec.get_unencrypted_table_name(key, iv))
@@ -93,9 +93,10 @@ if __name__ == '__main__':
 		print(rer.item_hash)
 		print(rer.get_unencrypted_table_name(key, iv))
 		i += 1
+	"""
 
 	adapter.disconnect()
-	"""
+	
 	print("\n====Column Encryption Record====\n")
 	print(col_encryption_rec.table_name_hash)
 	print(col_encryption_rec.table_name_AES)
@@ -111,7 +112,6 @@ if __name__ == '__main__':
 		print(rer.item_hash)
 		print(rer.owned_table_AES)
 		i += 1
-	"""
 
 	# update students set age = years_old
 	#insert into students(id, name, age) values (4, "james", 49)
