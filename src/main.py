@@ -48,6 +48,8 @@ def handle_user_args():
 	space = ' '
 	args.query = space.join(args.query)
 	args.command = space.join(args.command)
+	if args.row_to_insert:
+		args.row_to_insert = space.join(args.row_to_insert)
 
 	return args
 
@@ -66,14 +68,16 @@ def delete():
 def insert(user_query, adapter, new_row, table_name, key, iv):
 	# NOTE: user MUST specify a primary key!!!!
 	
-	# send the user's insert sql command to the DB
+	# send the user's insert sql command to the DB to see if it is valid
 	result = adapter.send_query(user_query)
 	print("insert to the db result")
 	print(result)
 
 	# send to blockchain if the DB statement was valid and worked
-	if not result:
+	if result:
+		print("Please reformulate query!")
 		return False
+	
 	
 	new_row_id = new_row[0]
 	new_itemID_hash = utils.get_item_id_hash(new_row_id)
@@ -81,8 +85,16 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 	new_item_hash = utils.get_item_hash_pk_present(new_row)
 	new_item_table_AES = utils.get_encrypted_table(table_name, key, iv)
 
-	
-	
+	# create the new record on the blockchain
+
+	# check if successful, if so, commit to the DB
+
+
+	# commit the results to the MySQL DB if both user query is valid
+	#	and the blockchain insert was successful
+	adapter.connection.commit()
+
+	return True
 
 
 # implement first
@@ -93,6 +105,8 @@ def query(user_query, adapter):
 
 	# print the results
 	print(query_results)
+
+	return True
 
 
 
