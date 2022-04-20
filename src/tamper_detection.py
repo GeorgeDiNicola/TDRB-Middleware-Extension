@@ -84,6 +84,8 @@ def rerc(table_name, adapter, key, iv):
 	""" """
 
 	tamper_flag = 0  # zero indicates no tampering
+	tampered_records_primary_key_list = []
+
 	query = "select * from " + table_name  # construct the query for getting the data from the table
 	results = adapter.send_query(query)
 	
@@ -104,6 +106,7 @@ def rerc(table_name, adapter, key, iv):
 		if item_hash not in str(blockchain_result):
 			print("tampering detected: ILLEGAL MODIFICATION")
 			print(blockchain_result)
+			tampered_records_primary_key_list.append(item_id)
 			tamper_flag = 1
 		
 		# if fail, try to query one more time
@@ -116,7 +119,7 @@ def rerc(table_name, adapter, key, iv):
 		#   illegal_modify.push(Decrypt(item_id, owned_table_aes))   PK and tablename modified
 		#	tamper_flag = 1
 
-	return tamper_flag
+	return tamper_flag, tampered_records_primary_key_list
 
 
 

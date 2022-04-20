@@ -10,6 +10,8 @@ from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.Cipher import AES
 
+import pandas as pd
+
 import setup
 import config
 import utils
@@ -19,6 +21,8 @@ import blockchain
 from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord
+import pymysql
+
 
 # settings holds the AES encrypt and decrypt key
 settings = config.load_config()
@@ -87,6 +91,7 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 
 	# create the new record on the blockchain
 
+
 	# check if successful, if so, commit to the DB
 
 
@@ -98,13 +103,24 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 
 
 # implement first
-def query(user_query, adapter):
+def query(user_query, adapter, tampered_primary_keys):
+
+	# send the user's query to the DB and read in the results as a pandas DF
+
+	# TODO: replace the adapter connection with pymysql
+	df = pd.read_sql_query(user_query, adapter.connection)
+	df["tamper_column"] = 0  # set the detect column to false
+	print(df)
+
+	# TODO: name all PRIMARY KEY columns to ID in mysql!
+	for pk in tampered_primary_keys:
+		df.loc[df.student_id == pk, "tamper_column"] = 1  # 1 indicates tampered
 	
-	# send the user's query to the DB
-	query_results = adapter.send_query(user_query)
+	print(df)
+	#query_results = adapter.send_query(user_query)
 
 	# print the results
-	print(query_results)
+	#print(query_results)
 
 	return True
 
@@ -135,6 +151,8 @@ if __name__ == '__main__':
 	# for table in list_of_sql_tables:
 	query_for_tamper_check = "select * from " + table_name  # construct the query for getting the data from the table
 	results = adapter.send_query(query_for_tamper_check)
+
+
 
 
 	key = settings["aes_key"]
@@ -170,7 +188,8 @@ if __name__ == '__main__':
 	rerc_tamper_flag = 0
 
 	# detect illegal insert or delete step
-	#cerc_tamper_flag td.cerc(table_name, adapter, key, iv)
+	# cerc_tamper_flag, tampered_primary_keys = td.cerc(table_name, adapter, key, iv)
+	tampered_primary_keys = [2]
 
 
 	if rerc_tamper_flag:
@@ -186,7 +205,7 @@ if __name__ == '__main__':
 
 	# handle the user's query when no detection
 	if user_command == "query":
-		query(user_query, adapter)
+		query(user_query, adapter, tampered_primary_keys)
 	elif user_command == "insert":
 		insert(user_query, adapter, row_to_insert, table_name, key, iv)
 
