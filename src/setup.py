@@ -31,7 +31,8 @@ def convert_table_to_record_encryption_records(table, table_name):
 		item_id = row[0]
 		rer.item_id_hash = utils.get_item_id_hash(item_id)
 		rer.item_hash = utils.get_item_hash_pk_present(row)
-		rer.item_id_AES = utils.get_encrypted_item_id(item_id, settings["aes_key"], settings["iv"])
+		#rer.item_id_AES = utils.get_encrypted_item_id(item_id, settings["aes_key"], settings["iv"])
+		rer.item_id_AES = item_id
 		rer.owned_table_AES = utils.get_encrypted_table(table_name, settings["aes_key"], settings["iv"])
 		row_encryption_records.append(rer)
 	

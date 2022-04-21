@@ -110,17 +110,14 @@ def query(user_query, adapter, tampered_primary_keys):
 	# TODO: replace the adapter connection with pymysql
 	df = pd.read_sql_query(user_query, adapter.connection)
 	df["tamper_column"] = 0  # set the detect column to false
-	print(df)
 
 	# TODO: name all PRIMARY KEY columns to ID in mysql!
-	for pk in tampered_primary_keys:
-		df.loc[df.student_id == pk, "tamper_column"] = 1  # 1 indicates tampered
+	if len(tampered_primary_keys) > 0:
+		for pk in tampered_primary_keys:
+			df.loc[df.student_id == pk, "tamper_column"] = 1  # 1 indicates tampered
 	
-	print(df)
-	#query_results = adapter.send_query(user_query)
-
 	# print the results
-	#print(query_results)
+	print(df)
 
 	return True
 
@@ -184,14 +181,14 @@ if __name__ == '__main__':
 
 
 	# detect illegal modification step
-	#rerc_tamper_flag = td.rerc(table_name, adapter, key, iv)
+	rerc_tamper_flag, tampered_primary_keys = td.rerc(table_name, adapter, key, iv)
 	rerc_tamper_flag = 0
 
 	# detect illegal insert or delete step
-	# cerc_tamper_flag, tampered_primary_keys = td.cerc(table_name, adapter, key, iv)
-	tampered_primary_keys = [2]
+	#cerc_tamper_flag, tampered_primary_keys = td.cerc(table_name, adapter, key, iv)
 
 
+	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag:
 		# return tamper information
 		print("TAMPERING INFO: the data has been tampered with")
@@ -205,8 +202,10 @@ if __name__ == '__main__':
 
 	# handle the user's query when no detection
 	if user_command == "query":
+		print(tampered_primary_keys)
 		query(user_query, adapter, tampered_primary_keys)
 	elif user_command == "insert":
+		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 		insert(user_query, adapter, row_to_insert, table_name, key, iv)
 
 

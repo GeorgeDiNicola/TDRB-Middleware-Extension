@@ -1,11 +1,11 @@
-from subprocess import check_output
+from subprocess import check_output, call
 
 # the below are for Row Encryption Records
 def query_blockchain(queryId):
 	
 	blockchain_result = ""
 	try:
-		blockchain_result = check_output(['node', 'query.js', queryId])
+		blockchain_result = check_output(['node', 'query.js', queryId.encode()])
 	except:
 		print("ERROR: blockchain query failed")
 	
@@ -18,13 +18,18 @@ def query_blockchain(queryId):
 def create_blockchain_record(item_id_hash, item_id_AES, item_hash, owned_table_AES):
 
 	blockchain_result = ""
+
+	item_id_AES = str(item_id_AES)
+
 	try:
-		blockchain_result = check_output(['node', 'invoke.js', item_id_hash.encode(), item_id_AES.encode(), item_hash.encode(), owned_table_AES.encode()])
+		blockchain_result = call(['node', 'invoke.js', item_id_hash, item_id_AES, item_hash, owned_table_AES])
 	except:
 		print("ERROR: blockchain create failed")
+		print(blockchain_result)
 
-	if "Failed to evaluate transaction" in blockchain_result:
-		print("ERROR: blockchain query failed")
+	#if "Failed to evaluate transaction" in blockchain_result:
+	#	print(blockchain_result)
+	#	print("ERROR: blockchain create failed")
 
 
 	return blockchain_result

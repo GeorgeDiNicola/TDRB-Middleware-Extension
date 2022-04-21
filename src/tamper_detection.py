@@ -92,7 +92,7 @@ def rerc(table_name, adapter, key, iv):
 	for row in results:
 		item_id = row[0]
 		item_id_hash = utils.get_item_id_hash(item_id)
-		item_hash = utils.get_item_hash(row)
+		item_hash = utils.get_item_hash_pk_present(row)
 		item_id_aes = utils.get_encrypted_item_id(item_id, key, iv)
 		owned_table_aes = utils.get_encrypted_table(table_name, key, iv)
 		print(item_id_hash)
@@ -101,7 +101,10 @@ def rerc(table_name, adapter, key, iv):
 		print(owned_table_aes)
 
 
-		blockchain_result = check_output(['node', 'query.js', item_id_hash])
+		try:
+			blockchain_result = check_output(['node', 'query.js', item_id_hash])
+		except:
+			blockchain_result = ""  # no result for the query found above
 		
 		if item_hash not in str(blockchain_result):
 			print("tampering detected: ILLEGAL MODIFICATION")
