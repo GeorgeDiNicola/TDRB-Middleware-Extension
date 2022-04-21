@@ -94,6 +94,8 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 
 
 	# check if successful, if so, commit to the DB
+	
+	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_commit_success:
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful

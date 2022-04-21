@@ -95,10 +95,6 @@ def rerc(table_name, adapter, key, iv):
 		item_hash = utils.get_item_hash_pk_present(row)
 		item_id_aes = utils.get_encrypted_item_id(item_id, key, iv)
 		owned_table_aes = utils.get_encrypted_table(table_name, key, iv)
-		print(item_id_hash)
-		print(item_hash)
-		print(item_id_aes)
-		print(owned_table_aes)
 
 
 		try:
@@ -112,16 +108,6 @@ def rerc(table_name, adapter, key, iv):
 			print(blockchain_result)
 			tampered_records_primary_key_list.append(item_id)
 			tamper_flag = 1
-		
-		# if fail, try to query one more time
-		#if "Failed to evaluate transaction" in blockchain_result:
-		#	print("query failed")
-
-		# use item_id_hash CHECK THE BLOCKCHAIN!
-		# query_item_hash = blockchain_query(item_id_hash)
-		# if item_hash != query_item_hash:
-		#   illegal_modify.push(Decrypt(item_id, owned_table_aes))   PK and tablename modified
-		#	tamper_flag = 1
 
 	return tamper_flag, tampered_records_primary_key_list
 
