@@ -34,8 +34,6 @@ adapter.connect()
 query_for_table_records = "select * from " + table_name  # construct the query for getting the data from the table
 results = adapter.send_query(query_for_table_records)
 
-print(results)
-
 
 # step 3: convert each record to the row encryption record format
 row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
@@ -47,10 +45,5 @@ i = 1
 for rer in row_encryption_recs:
 	# blockchain create record
 	print("record :", i)
-	item_id_hash = str(rer.item_id_hash)
-	#item_id = rer.get_unencrypted_itemID(key, iv)
-	item_id = str(rer.item_id_AES)
-	item_hash = str(rer.item_hash)
-	owned_table = str(table_name)
-	result = create_blockchain_record(item_id_hash, item_id, item_hash, owned_table)
+	result = create_blockchain_record(rer.item_id_hash, rer.item_id_AES, rer.item_hash, rer.owned_table_AES)
 	i += 1

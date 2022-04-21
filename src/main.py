@@ -74,8 +74,6 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 	
 	# send the user's insert sql command to the DB to see if it is valid
 	result = adapter.send_query(user_query)
-	print("insert to the db result")
-	print(result)
 
 	# send to blockchain if the DB statement was valid and worked
 	if result:
@@ -86,18 +84,20 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 	new_row_id = new_row[0]
 	new_itemID_hash = utils.get_item_id_hash(new_row_id)
 	new_itemID_AES = utils.get_encrypted_item_id(new_row_id, key, iv)
+	new_itemID_AES = new_row[0]
 	new_item_hash = utils.get_item_hash_pk_present(new_row)
 	new_item_table_AES = utils.get_encrypted_table(table_name, key, iv)
+	#new_item_table_AES = table_name
 
 	# create the new record on the blockchain
+	blockchain_commit_success = blockchain.create_blockchain_record(new_itemID_hash, new_itemID_AES, new_item_hash, new_item_table_AES)
 
 
 	# check if successful, if so, commit to the DB
-
-
-	# commit the results to the MySQL DB if both user query is valid
-	#	and the blockchain insert was successful
-	adapter.connection.commit()
+	if blockchain_commit_success:
+		# commit the results to the MySQL DB if both user query is valid
+		#	and the blockchain insert was successful
+		adapter.connection.commit()
 
 	return True
 
@@ -130,7 +130,11 @@ if __name__ == '__main__':
 
 	user_query = args.query
 	user_command = args.command
-	row_to_insert = args.row_to_insert
+	if args.row_to_insert:
+		row_to_insert = args.row_to_insert
+		row_to_insert = row_to_insert.split()
+		#row_to_insert = list(row_to_insert)
+		print(row_to_insert)
 
 	
 	table_name = "student"
@@ -163,6 +167,7 @@ if __name__ == '__main__':
 	row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
 
 	# read the encrypted records
+	"""
 	print("\n====Column Encryption Record====\n")
 	print(col_encryption_rec.table_name_hash)
 	print(col_encryption_rec.table_name_AES)
@@ -178,7 +183,7 @@ if __name__ == '__main__':
 		print(rer.item_hash)
 		print(rer.owned_table_AES)
 		i += 1
-
+	"""
 
 	# detect illegal modification step
 	rerc_tamper_flag, tampered_primary_keys = td.rerc(table_name, adapter, key, iv)
@@ -202,7 +207,6 @@ if __name__ == '__main__':
 
 	# handle the user's query when no detection
 	if user_command == "query":
-		print(tampered_primary_keys)
 		query(user_query, adapter, tampered_primary_keys)
 	elif user_command == "insert":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!

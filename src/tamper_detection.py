@@ -104,6 +104,7 @@ def rerc(table_name, adapter, key, iv):
 		try:
 			blockchain_result = check_output(['node', 'query.js', item_id_hash])
 		except:
+			print("CAUGHT EXCEPTION")
 			blockchain_result = ""  # no result for the query found above
 		
 		if item_hash not in str(blockchain_result):

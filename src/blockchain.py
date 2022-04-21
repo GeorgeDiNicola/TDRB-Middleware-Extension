@@ -19,20 +19,16 @@ def create_blockchain_record(item_id_hash, item_id_AES, item_hash, owned_table_A
 
 	blockchain_result = ""
 
-	item_id_AES = str(item_id_AES)
+	#item_id_AES = str(item_id_AES)
 
 	try:
 		blockchain_result = call(['node', 'invoke.js', item_id_hash, item_id_AES, item_hash, owned_table_AES])
 	except:
 		print("ERROR: blockchain create failed")
 		print(blockchain_result)
+		return False
 
-	#if "Failed to evaluate transaction" in blockchain_result:
-	#	print(blockchain_result)
-	#	print("ERROR: blockchain create failed")
-
-
-	return blockchain_result
+	return True
 
 def update_blockchain_record(item_id_hash, new_item_hash):
 
