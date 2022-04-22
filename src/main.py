@@ -60,6 +60,9 @@ def handle_user_args():
 		args.row_to_insert = space.join(args.row_to_insert)
 	if args.update_template:
 		args.update_template = space.join(args.update_template)
+	# TOOD: change the pk_to_delete var name since I am collecting more of them
+	if args.pk_to_delete:
+		args.pk_to_delete = space.join(args.pk_to_delete)
 
 	return args
 
@@ -89,7 +92,7 @@ def update(existing_item_id_hash, new_item_hash):
 
 
 
-def delete(item_id):
+def delete(user_query, adapter, item_id):
 	
 	# send the user's DELETE sql command to the DB to see if it is valid
 	result = adapter.send_query(user_query)
@@ -101,7 +104,7 @@ def delete(item_id):
 	
 	item_id_hash_to_delete = utils.get_item_id_hash(item_id)
 	
-	blockchain_commit_success = blockchain.delete_blockchain_record(existing_item_id_hash, item_id_hash_to_delete)
+	blockchain_commit_success = blockchain.delete_blockchain_record(item_id_hash_to_delete)
 
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_commit_success:
@@ -183,15 +186,14 @@ if __name__ == '__main__':
 	if args.row_to_insert:
 		row_to_insert = args.row_to_insert
 		row_to_insert = row_to_insert.split(',')
-		#row_to_insert = list(row_to_insert)
-		print(row_to_insert)
 	if args.update_template:
 		update_template = args.update_template
 		update_template = update_template.split(',')
-		#row_to_insert = list(row_to_insert)
-		print(update_template)
+	
+	# TOOD: have primary keys to delete as a LIST data structure so I can delete more than 1
 	if args.pk_to_delete:
-		pk_to_delete = args.pk_to_delete
+		pks_to_delete = args.pk_to_delete
+		pks_to_delete = pks_to_delete.split(',')
 
 	
 	table_name = "student"
@@ -269,7 +271,8 @@ if __name__ == '__main__':
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 		res = insert(user_query, adapter, row_to_insert, table_name, key, iv)
 	elif user_command == "delete":
-		res = insert(user_query, adapter, pk_to_delete)
+		pk_to_delete = pks_to_delete[0]
+		res = delete(user_query, adapter, pk_to_delete)
 	#elif user_command == "update":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 	#	item_id = update_template[0]

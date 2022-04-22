@@ -7,3 +7,12 @@ ex) python3 main.py --q "select * from student" --c "query"
 Insert/Create: python3 main.py --q <sql_query> --c "insert" --r <row separated by commas>
 
 ex) python3 main.py --q "insert into student (student_id, name, sex, age) values (4, 'Mike', 'Male', 31);" --c "insert" --r '4 Mike Male 31'
+
+
+
+Delete (World state): python3 main.py --q <sql_query> --c "delete" --r <primary_key>
+
+ex) python3 main.py --q "delete from student where student_id=5" --c "delete" --d '5'
+
+
+#TODO: have switches for --c, --d, --r values to make adding input easier/uniform
