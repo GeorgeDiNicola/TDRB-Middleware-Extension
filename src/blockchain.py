@@ -34,7 +34,21 @@ def update_blockchain_record(item_id_hash, new_item_hash):
 
 	blockchain_result = ""
 	try:
-		blockchain_result = check_output(['node', 'update.js', item_id_hash, new_item_hash])
+		blockchain_result = call(['node', 'update.js', item_id_hash, new_item_hash])
+	except:
+		print("ERROR: blockchain update failed")
+
+	if "Failed to evaluate transaction" in blockchain_result:
+		print("ERROR: blockchain query failed")
+
+
+	return blockchain_result
+
+def delete_blockchain_record(item_id_hash):
+
+	blockchain_result = ""
+	try:
+		blockchain_result = call(['node', 'delete.js', item_id_hash])
 	except:
 		print("ERROR: blockchain update failed")
 

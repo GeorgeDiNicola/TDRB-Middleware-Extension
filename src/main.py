@@ -41,6 +41,10 @@ def handle_user_args():
 		nargs='+', help='Command (insert, delete, update, query')
 	parser.add_argument('--r', dest='row_to_insert', required=False, type=str,
 		nargs='+', help='Command (insert, delete, update, query')
+	parser.add_argument('--u', dest='update_template', required=False, type=str,
+		nargs='+', help='Command (insert, delete, update, query')
+	parser.add_argument('--d', dest='pk_to_delete', required=False, type=str,
+		nargs='+', help='Command (insert, delete, update, query')
 
 	args = parser.parse_args()
 
@@ -54,21 +58,64 @@ def handle_user_args():
 	args.command = space.join(args.command)
 	if args.row_to_insert:
 		args.row_to_insert = space.join(args.row_to_insert)
+	if args.update_template:
+		args.update_template = space.join(args.update_template)
 
 	return args
 
 
+# do LAST. this one might be the hardest one since a second query would be needed to get
+#  the plaintext records to hash with the upated record
+def update(existing_item_id_hash, new_item_hash):
+	
+	# send the user's UPDATE sql command to the DB to see if it is valid
+	result = adapter.send_query(user_query)
 
-def update():
-	pass
+	# send to blockchain if the DB statement was valid and worked
+	if result:
+		print("Please reformulate SQL query!")
+		return False
+	
+	blockchain_commit_success = blockchain.update_blockchain_record(existing_item_id_hash, new_item_hash)
+
+	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
+	if blockchain_commit_success:
+		# commit the results to the MySQL DB if both user query is valid
+		#	and the blockchain insert was successful
+		adapter.connection.commit()
+	# TODO: add else to return False
+
+	return True
 
 
-def delete():
-	pass
+
+def delete(item_id):
+	
+	# send the user's DELETE sql command to the DB to see if it is valid
+	result = adapter.send_query(user_query)
+
+	# send to blockchain if the DB statement was valid and worked
+	if result:
+		print("Please reformulate SQL query!")
+		return False
+	
+	item_id_hash_to_delete = utils.get_item_id_hash(item_id)
+	
+	blockchain_commit_success = blockchain.delete_blockchain_record(existing_item_id_hash, item_id_hash_to_delete)
+
+	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
+	if blockchain_commit_success:
+		# commit the results to the MySQL DB if both user query is valid
+		#	and the blockchain insert was successful
+		adapter.connection.commit()
+	# TODO: add else to return False
+
+	return True
+
+
 
 
 # implement second
-
 def insert(user_query, adapter, new_row, table_name, key, iv):
 	# NOTE: user MUST specify a primary key!!!!
 	
@@ -77,7 +124,7 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 
 	# send to blockchain if the DB statement was valid and worked
 	if result:
-		print("Please reformulate query!")
+		print("Please reformulate SQL query!")
 		return False
 	
 	
@@ -100,6 +147,7 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful
 		adapter.connection.commit()
+	# TODO: add else to return False
 
 	return True
 
@@ -134,9 +182,16 @@ if __name__ == '__main__':
 	user_command = args.command
 	if args.row_to_insert:
 		row_to_insert = args.row_to_insert
-		row_to_insert = row_to_insert.split()
+		row_to_insert = row_to_insert.split(',')
 		#row_to_insert = list(row_to_insert)
 		print(row_to_insert)
+	if args.update_template:
+		update_template = args.update_template
+		update_template = update_template.split(',')
+		#row_to_insert = list(row_to_insert)
+		print(update_template)
+	if args.pk_to_delete:
+		pk_to_delete = args.pk_to_delete
 
 	
 	table_name = "student"
@@ -209,10 +264,17 @@ if __name__ == '__main__':
 
 	# handle the user's query when no detection
 	if user_command == "query":
-		query(user_query, adapter, tampered_primary_keys)
+		res = query(user_query, adapter, tampered_primary_keys)
 	elif user_command == "insert":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
-		insert(user_query, adapter, row_to_insert, table_name, key, iv)
+		res = insert(user_query, adapter, row_to_insert, table_name, key, iv)
+	elif user_command == "delete":
+		res = insert(user_query, adapter, pk_to_delete)
+	#elif user_command == "update":
+		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
+	#	item_id = update_template[0]
+	#	item_id = update_template[0]
+	#	res = update(user_query, adapter, row_to_insert, table_name, key, iv)
 
 
 
