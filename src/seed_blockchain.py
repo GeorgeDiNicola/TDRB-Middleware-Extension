@@ -38,9 +38,14 @@ results = adapter.send_query(query_for_table_records)
 # step 3: convert each record to the row encryption record format
 row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
 
-#TODO: add for column level encryption too!
+# step 3 b: convert the results to the column encryption record format
+cer = setup.convert_table_to_column_encryption_record(results, table_name)
 
-#step 4: iterate over the row encryption records and commit each to the blockchain
+# step 4
+result = create_blockchain_record(cer.table_name_hash, cer.table_name_AES, cer.column_hash, cer.table_name_AES)
+
+
+#step 5: iterate over the row encryption records and commit each to the blockchain
 i = 1
 for rer in row_encryption_recs:
 	# blockchain create record

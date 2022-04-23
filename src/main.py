@@ -226,13 +226,14 @@ if __name__ == '__main__':
 	row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
 
 	# read the encrypted records
-	"""
+	
 	print("\n====Column Encryption Record====\n")
 	print(col_encryption_rec.table_name_hash)
 	print(col_encryption_rec.table_name_AES)
 	print(col_encryption_rec.column_hash)
 	print("==============================\n")
-
+	
+	"""
 	print("====Row Encryption Records====\n")
 	i = 1
 	for rer in row_encryption_recs:
@@ -245,28 +246,28 @@ if __name__ == '__main__':
 	"""
 
 	# detect illegal modification step
-	rerc_tamper_flag, tampered_primary_keys = td.rerc(table_name, adapter, key, iv)
-	rerc_tamper_flag = 0
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(table_name, adapter, key, iv)
+	#rerc_tamper_flag = 0
 
 	# detect illegal insert or delete step
-	#cerc_tamper_flag, tampered_primary_keys = td.cerc(table_name, adapter, key, iv)
+	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, adapter, key, iv)
+	print(cerc_tamper_flag)
+	print(cerc_info)
 
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag:
 		# return tamper information
-		print("TAMPERING INFO: the data has been tampered with")
-
-	#if cerc_tamper_flag:
-		# return tamper information
-		#print("TAMPERING INFO: the data has been tampered with")
-
+		print("RERC TAMPERING INFO: the data has been tampered with")
+	if cerc_tamper_flag:
+		print("CERC TAMPERING INFO: the data has been tampered with")
+	
 	
 	# data not tampered with
 
 	# handle the user's query when no detection
 	if user_command == "query":
-		res = query(user_query, adapter, tampered_primary_keys)
+		res = query(user_query, adapter, rerc_tampered_primary_keys)
 	elif user_command == "insert":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 		res = insert(user_query, adapter, row_to_insert, table_name, key, iv)
