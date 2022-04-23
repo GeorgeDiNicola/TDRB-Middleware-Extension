@@ -225,35 +225,11 @@ if __name__ == '__main__':
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(results, table_name)
 	row_encryption_recs = setup.convert_table_to_record_encryption_records(results, table_name)
 
-	# read the encrypted records
-	
-	print("\n====Column Encryption Record====\n")
-	print(col_encryption_rec.table_name_hash)
-	print(col_encryption_rec.table_name_AES)
-	print(col_encryption_rec.column_hash)
-	print("==============================\n")
-	
-	"""
-	print("====Row Encryption Records====\n")
-	i = 1
-	for rer in row_encryption_recs:
-		print("record :", i)
-		print(rer.item_id_hash)
-		print(rer.item_id_AES)
-		print(rer.item_hash)
-		print(rer.owned_table_AES)
-		i += 1
-	"""
-
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(table_name, adapter, key, iv)
-	#rerc_tamper_flag = 0
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(results, table_name, adapter, key, iv)
 
 	# detect illegal insert or delete step
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, adapter, key, iv)
-	print(cerc_tamper_flag)
-	print(cerc_info)
-
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag:
