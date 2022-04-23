@@ -15,6 +15,18 @@ def get_column_hash(results):
 	final_hash = SHA_256_conversion(hash_string)
 	return final_hash
 
+def get_column_hash_pks_only(primary_keys):
+	# assumes the primary key is the first column in the table!
+
+	hash_string = []
+
+	for pk in primary_keys:
+		str_pk = str(pk)  # convert the PKs to string for hashing
+		hash_string += str_pk
+
+	final_hash = SHA_256_conversion(hash_string)
+	return final_hash
+
 
 def SHA_256_conversion(data):
 

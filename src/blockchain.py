@@ -12,7 +12,7 @@ def query_blockchain(queryId):
 	if "Failed to evaluate transaction" in blockchain_result:
 		print("ERROR: key not found")
 
-	return blockchain_result
+	return True
 
 
 def create_blockchain_record(item_id_hash, item_id_AES, item_hash, owned_table_AES):
@@ -37,11 +37,9 @@ def update_blockchain_record(item_id_hash, new_item_hash):
 		blockchain_result = call(['node', 'update.js', item_id_hash, new_item_hash])
 	except:
 		print("ERROR: blockchain update failed")
+		return False
 
-	if "Failed to evaluate transaction" in blockchain_result:
-		print("ERROR: blockchain query failed")
-
-	return blockchain_result
+	return True
 
 
 def delete_blockchain_record(item_id_hash):
@@ -51,5 +49,6 @@ def delete_blockchain_record(item_id_hash):
 		blockchain_result = call(['node', 'delete.js', item_id_hash])
 	except:
 		print("ERROR: blockchain update failed")
+		return False
 
-	return blockchain_result
+	return True

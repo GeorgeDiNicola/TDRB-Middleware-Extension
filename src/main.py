@@ -119,7 +119,7 @@ def delete(user_query, adapter, item_id):
 
 
 # implement second
-def insert(user_query, adapter, new_row, table_name, key, iv):
+def insert(user_query, adapter, new_row, table_name, key, iv, column_enc_id, pks_for_new_row):
 	# NOTE: user MUST specify a primary key!!!!
 	
 	# send the user's insert sql command to the DB to see if it is valid
@@ -140,13 +140,18 @@ def insert(user_query, adapter, new_row, table_name, key, iv):
 	#new_item_table_AES = table_name
 
 	# create the new record on the blockchain
-	blockchain_commit_success = blockchain.create_blockchain_record(new_itemID_hash, new_itemID_AES, new_item_hash, new_item_table_AES)
+	blockchain_rer_commit_success = blockchain.create_blockchain_record(new_itemID_hash, new_itemID_AES, new_item_hash, new_item_table_AES)
 
+	# update the columnhash for the new pk to the blockchain
+	# calculate the new pk
+	new_column_hash = utils.get_column_hash_pks_only(pks_for_new_row)
+
+	blockchain_cer_commit_success = blockchain.update_blockchain_record(column_enc_id, new_column_hash)
 
 	# check if successful, if so, commit to the DB
 	
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
-	if blockchain_commit_success:
+	if blockchain_rer_commit_success and blockchain_cer_commit_success:
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful
 		adapter.connection.commit()
@@ -213,8 +218,6 @@ if __name__ == '__main__':
 	results = adapter.send_query(query_for_tamper_check)
 
 
-
-
 	key = settings["aes_key"]
 	iv =  settings["iv"]
 	#iv = get_random_bytes(16)
@@ -232,12 +235,11 @@ if __name__ == '__main__':
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, adapter, key, iv)
 
 	# print the tampering info to the user before showing them the query results
-	if rerc_tamper_flag:
+	if rerc_tamper_flag == 1:
 		# return tamper information
 		print("RERC TAMPERING INFO: the data has been tampered with")
-	if cerc_tamper_flag:
+	if cerc_tamper_flag == 1:
 		print("CERC TAMPERING INFO: the data has been tampered with")
-	
 	
 	# data not tampered with
 
@@ -246,7 +248,11 @@ if __name__ == '__main__':
 		res = query(user_query, adapter, rerc_tampered_primary_keys)
 	elif user_command == "insert":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
-		res = insert(user_query, adapter, row_to_insert, table_name, key, iv)
+		pks = [item[0] for item in results]  # get pks
+		new_pk = pks[-1] + 1
+		pks.append(new_pk)
+		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
+		res = insert(user_query, adapter, row_to_insert, table_name, key, iv, cer_id, pks)
 	elif user_command == "delete":
 		pk_to_delete = pks_to_delete[0]
 		res = delete(user_query, adapter, pk_to_delete)
