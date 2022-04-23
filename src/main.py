@@ -92,7 +92,7 @@ def update(existing_item_id_hash, new_item_hash):
 
 
 
-def delete(user_query, adapter, item_id):
+def delete(user_query, adapter, item_id, column_enc_id, updated_primary_key_list):
 	
 	# send the user's DELETE sql command to the DB to see if it is valid
 	result = adapter.send_query(user_query)
@@ -104,10 +104,16 @@ def delete(user_query, adapter, item_id):
 	
 	item_id_hash_to_delete = utils.get_item_id_hash(item_id)
 	
-	blockchain_commit_success = blockchain.delete_blockchain_record(item_id_hash_to_delete)
+	# delete the record on the blockchain
+	blockchain_rer_commit_success = blockchain.delete_blockchain_record(item_id_hash_to_delete)
+
+	# update the columnhash for the new pk to the blockchain
+	new_column_hash = utils.get_column_hash_pks_only(updated_primary_key_list)
+
+	blockchain_cer_commit_success = blockchain.update_blockchain_record(column_enc_id, new_column_hash)
 
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
-	if blockchain_commit_success:
+	if blockchain_rer_commit_success and blockchain_cer_commit_success:
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful
 		adapter.connection.commit()
@@ -143,7 +149,6 @@ def insert(user_query, adapter, new_row, table_name, key, iv, column_enc_id, pks
 	blockchain_rer_commit_success = blockchain.create_blockchain_record(new_itemID_hash, new_itemID_AES, new_item_hash, new_item_table_AES)
 
 	# update the columnhash for the new pk to the blockchain
-	# calculate the new pk
 	new_column_hash = utils.get_column_hash_pks_only(pks_for_new_row)
 
 	blockchain_cer_commit_success = blockchain.update_blockchain_record(column_enc_id, new_column_hash)
@@ -254,8 +259,13 @@ if __name__ == '__main__':
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = insert(user_query, adapter, row_to_insert, table_name, key, iv, cer_id, pks)
 	elif user_command == "delete":
+		pks = [item[0] for item in results]  # get pks
 		pk_to_delete = pks_to_delete[0]
-		res = delete(user_query, adapter, pk_to_delete)
+		print(pks)
+		print(pk_to_delete)
+		pks.remove(int(pk_to_delete))
+		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
+		res = delete(user_query, adapter, pk_to_delete, cer_id, pks)
 	#elif user_command == "update":
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 	#	item_id = update_template[0]
