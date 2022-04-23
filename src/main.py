@@ -114,8 +114,7 @@ def delete(user_query, adapter, item_id, column_enc_id, updated_primary_key_list
 
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_rer_commit_success and blockchain_cer_commit_success:
-		# commit the results to the MySQL DB if both user query is valid
-		#	and the blockchain insert was successful
+		# commit the results to the MySQL DB if both user query is valid and the blockchain insert was successful
 		adapter.connection.commit()
 	# TODO: add else to return False
 
@@ -157,8 +156,7 @@ def insert(user_query, adapter, new_row, table_name, key, iv, column_enc_id, pks
 	
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_rer_commit_success and blockchain_cer_commit_success:
-		# commit the results to the MySQL DB if both user query is valid
-		#	and the blockchain insert was successful
+		# commit the results to the MySQL DB if both user query is valid and the blockchain insert was successful
 		adapter.connection.commit()
 	# TODO: add else to return False
 
@@ -251,18 +249,16 @@ if __name__ == '__main__':
 	# handle the user's query when no detection
 	if user_command == "query":
 		res = query(user_query, adapter, rerc_tampered_primary_keys)
-	elif user_command == "insert":
+	elif user_command == "insert" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 		pks = [item[0] for item in results]  # get pks
 		new_pk = pks[-1] + 1
 		pks.append(new_pk)
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = insert(user_query, adapter, row_to_insert, table_name, key, iv, cer_id, pks)
-	elif user_command == "delete":
+	elif user_command == "delete" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 		pks = [item[0] for item in results]  # get pks
 		pk_to_delete = pks_to_delete[0]
-		print(pks)
-		print(pk_to_delete)
 		pks.remove(int(pk_to_delete))
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = delete(user_query, adapter, pk_to_delete, cer_id, pks)
