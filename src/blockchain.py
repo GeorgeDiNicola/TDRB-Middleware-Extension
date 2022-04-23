@@ -8,9 +8,6 @@ def query_blockchain(queryId):
 		blockchain_result = check_output(['node', 'query.js', queryId.encode()])
 	except:
 		print("ERROR: blockchain query failed")
-	
-	if "Failed to evaluate transaction" in blockchain_result:
-		print("ERROR: key not found")
 
 	return True
 
@@ -25,7 +22,6 @@ def create_blockchain_record(item_id_hash, item_id_AES, item_hash, owned_table_A
 		blockchain_result = call(['node', 'invoke.js', item_id_hash, item_id_AES, item_hash, owned_table_AES])
 	except:
 		print("ERROR: blockchain create failed")
-		print(blockchain_result)
 		return False
 
 	return True

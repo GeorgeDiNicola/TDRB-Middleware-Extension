@@ -37,7 +37,7 @@ def cerc(col_encryption_rec, table_name, adapter, key, iv):
 		blockchain_result = ""  # no result for the query found above
 
 	if col_encryption_rec.column_hash not in str(blockchain_result):
-			tamper_info = "tampering detected: ILLEGAL INSERT OR DELETE"
+			#tamper_info = "tampering detected: ILLEGAL INSERT OR DELETE"
 			tamper_flag = 1
 
 	return tamper_flag, tamper_info
@@ -68,7 +68,7 @@ def rerc(results, table_name, adapter, key, iv):
 			blockchain_result = ""  # no result for the query found above
 		
 		if item_hash not in str(blockchain_result):
-			print("tampering detected: ILLEGAL MODIFICATION")
+			#print("tampering detected: ILLEGAL MODIFICATION")
 			tampered_records_primary_key_list.append(item_id)
 			tamper_flag = 1
 

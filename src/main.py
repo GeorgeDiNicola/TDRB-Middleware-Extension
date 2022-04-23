@@ -121,9 +121,6 @@ def delete(user_query, adapter, item_id, column_enc_id, updated_primary_key_list
 	return True
 
 
-
-
-# implement second
 def insert(user_query, adapter, new_row, table_name, key, iv, column_enc_id, pks_for_new_row):
 	# NOTE: user MUST specify a primary key!!!!
 	
@@ -163,8 +160,7 @@ def insert(user_query, adapter, new_row, table_name, key, iv, column_enc_id, pks
 	return True
 
 
-# implement first
-def query(user_query, adapter, tampered_primary_keys):
+def query(user_query, adapter, tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag):
 
 	# send the user's query to the DB and read in the results as a pandas DF
 
@@ -176,12 +172,27 @@ def query(user_query, adapter, tampered_primary_keys):
 	if len(tampered_primary_keys) > 0:
 		for pk in tampered_primary_keys:
 			df.loc[df.student_id == pk, "tamper_column"] = 1  # 1 indicates tampered
+
+	if cerc_tamper_flag == 1 and rerc_tamper_flag == 1:
+		if len(df.loc[df.tamper_column == 1]) > 0:
+			print("The records below contain an illegal modification and/or insert and are marked in the tamper_column\n")
+		else:
+			print("The records below are missing one or more valid rows (illegal deletion)\n")
+	elif cerc_tamper_flag == 1:
+		if len(df.loc[df.tamper_column == 1]) > 0:
+			print("The records below contain an illegal insertion and are marked in the tamper_column\n")
+		else:
+			print("The records below are missing one or more valid rows (illegal deletion)\n")
+	elif rerc_tamper_flag == 1:
+		print("The records below contain an illegal modification and are marked in the tamper_column\n")
+
+
+
 	
 	# print the results
 	print(df)
 
 	return True
-
 
 
 
@@ -240,17 +251,17 @@ if __name__ == '__main__':
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:
 		# return tamper information
-		print("RERC TAMPERING INFO: the data has been tampered with")
+		print("TAMPERING DETECTED - ILLEGAL MODIFICATION: the data has been tampered with")
 	if cerc_tamper_flag == 1:
-		print("CERC TAMPERING INFO: the data has been tampered with")
+		print("TAMPERING DETECTED - ILLEGAL INSERT/DELETE: the data has been tampered with")
 	
 	# data not tampered with
 
 	# handle the user's query when no detection
+	# NOTE: DO NOT INSERT, UPDATE, OR DELETE IF THE TAMPERING FLAG IS TRUE!
 	if user_command == "query":
-		res = query(user_query, adapter, rerc_tampered_primary_keys)
+		res = query(user_query, adapter, rerc_tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag)
 	elif user_command == "insert" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
-		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
 		pks = [item[0] for item in results]  # get pks
 		new_pk = pks[-1] + 1
 		pks.append(new_pk)
@@ -262,8 +273,9 @@ if __name__ == '__main__':
 		pks.remove(int(pk_to_delete))
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = delete(user_query, adapter, pk_to_delete, cer_id, pks)
-	#elif user_command == "update":
-		# NOTE: DO NOT INSERT IF THE TAMPERING FLAG IS TRUE!
+	else:
+		print("Cannot insert, update, or delete records. Underlying table has been modified")
+	#elif user_command == "update" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 	#	item_id = update_template[0]
 	#	item_id = update_template[0]
 	#	res = update(user_query, adapter, row_to_insert, table_name, key, iv)

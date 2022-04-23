@@ -1,0 +1,77 @@
+
+
+
+1. bring up networkand show it:
+
+./startFabric.sh javascript
+
+docker ps
+
+
+
+2. log into mysql and show the underlying relational table
+
+mysql -u root -p
+
+use students; select * from student;
+
+
+
+3. send the query operation through the middleware application
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+4. Tamper with the MySQL db (Modify) and show result
+
+mysql -u root -p
+
+use students; update student set age=29 where student_id=5;
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+5. Tamper with the MySQL db (insert) and show result
+
+mysql -u root -p
+
+use students; insert into student (student_id, name, sex, age) values (6, 'Joe', 'Male', 24);
+
+use students; select * from student;
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+6. Tamper with the MySQL db (delete) and show result
+
+mysql -u root -p
+
+use students; delete from student where student_id=2;
+
+use students; select * from student;
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+
+7. Make a valid insert using the middleware application
+
+python3 main.py --q "insert into student (student_id, name, sex, age) values (6, 'Joe', 'Male', 24);" --c "insert" --r '6,Joe,Male,24'
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+8. Make a valid deletion using the middleware application
+
+python3 main.py --q "delete from student where student_id=5" --c "delete" --d 5
+
+python3 main.py --q "select * from student" --c "query"
+
+
+
+

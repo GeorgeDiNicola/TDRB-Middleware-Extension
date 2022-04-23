@@ -16,3 +16,7 @@ insert into student (student_id, name, sex, age)
 values (2, "Bob", "Male", 21);
 insert into student (student_id, name, sex, age) 
 values (3, "Peter", "Male", 22);
+insert into student (student_id, name, sex, age) 
+values (4, "George", "Male", 27);
+insert into student (student_id, name, sex, age) 
+values (5, "William", "Male", 28);

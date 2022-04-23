@@ -45,7 +45,7 @@ async function main(itemIdHash, itemIdAES, itemHash, ownedTableAES) {
         await gateway.disconnect();
 
     } catch (error) {
-        console.error(`Failed to submit transaction: ${error}`);
+        //console.error(`Failed to submit transaction: ${error}`);
         process.exit(1);
     }
 }
