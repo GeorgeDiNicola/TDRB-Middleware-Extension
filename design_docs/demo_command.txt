@@ -73,8 +73,11 @@ python3 main.py --q "delete from student where student_id=5" --c "delete" --d 5
 python3 main.py --q "select * from student" --c "query"
 
 
+9. Mke a valid update using the middleware application
 
+python3 main.py --q "update student set name='updated' where student_id=5" --c "update" --u "5,updated"
 
+python3 main.py --q "select * from student" --c "query"
 
 mysql -u(root) -p(root) (students) -e "select * from student;"
 

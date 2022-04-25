@@ -70,23 +70,42 @@ def handle_user_args():
 
 # do LAST. this one might be the hardest one since a second query would be needed to get
 #  the plaintext records to hash with the upated record
-def update(existing_item_id_hash, new_item_hash):
+def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated_item_value):
 	
 	# send the user's UPDATE sql command to the DB to see if it is valid
-	result = adapter.send_query(user_query)
+	#result = sql_connection.execute(user_query)
+
+	# get the new item hash
+	update_col_name = 'name'
+	print(existing_item_id_hash)
+	condition = sql_table['student_id'] == str(existing_item_id_hash)
+	sql_table.loc[condition,'student_id'] = updated_item_value
+	print(updated_item_value)
+	
+	#sql_table[update_col_name][str(existing_item_id_hash)] = updated_item_value
+	print(sql_table)
+
+	# get the new row
+	#items = sql_table[sql_table.loc[sql_table.student_id == str(existing_item_id_hash)]]
+	#items = list(sql_table.iloc[])
+	items = sql_table.loc[sql_table['student_id'] == existing_item_id_hash]
+	print(items)
+	concatentated_items = "".join(map(str,items[1:]))  # concatenate the primary keys (for hash)
+
+	new_item_hash = utils.SHA_256_conversion(concatentated_items)
 
 	# send to blockchain if the DB statement was valid and worked
-	if result:
-		print("Please reformulate SQL query!")
-		return False
+	#if result:
+	#	print("Please reformulate SQL query!")
+	#	return False
 	
-	blockchain_commit_success = blockchain.update_blockchain_record(existing_item_id_hash, new_item_hash)
+	#blockchain_commit_success = blockchain.update_blockchain_record(existing_item_id_hash, new_item_hash)
 
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
-	if blockchain_commit_success:
+	#if blockchain_commit_success:
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful
-		adapter.connection.commit()
+	#	print("Update statement successfully executed")
 	# TODO: add else to return False
 
 	return True
@@ -259,14 +278,14 @@ if __name__ == '__main__':
 	# get the column encryption records and row encryption records for the database table
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(sql_data, table_name)
 	
-	#row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
+	row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
 
 
 	# detect illegal insert or delete step
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv)
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:
@@ -292,10 +311,10 @@ if __name__ == '__main__':
 		primary_keys.remove(int(pk_to_delete))
 		#cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = delete(user_query, sql_connection, pk_to_delete, primary_keys)
+	elif user_command == "update" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
+		item_id = update_template[0]
+		update_value = update_template[1]
+		res = update(user_query, sql_connection, sql_data, item_id, update_value)
 	else:
 		print("Cannot insert, update, or delete records. The underlying table has been modified")
-	#elif user_command == "update" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
-	#	item_id = update_template[0]
-	#	item_id = update_template[0]
-	#	res = update(user_query, adapter, row_to_insert, table_name, key, iv)
 

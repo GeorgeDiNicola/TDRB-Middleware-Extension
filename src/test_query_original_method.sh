@@ -4,4 +4,4 @@ do
         echo "Iteration: $i"
         time python3 main.py --q "select * from student" --c "query"
         sleep 5
-done 2>&1 | tee middleware_query_test.log
+done 2>&1 | tee middleware_query_test_original_method.log

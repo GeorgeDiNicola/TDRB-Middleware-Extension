@@ -1,7 +1,7 @@
 #!/bin/bash
-for i in {1..40}
+for i in {132..140}
 do
         echo "Iteration: $i"
         time python3 main.py --q "insert into student (student_id, name, sex, age) values (${i}, 'test${i}', 'Male', ${i});" --c "insert" --r "${i},test${i},Male,${i}"
-        sleep 5
-done 2>&1 | tee middleware_insert_test_original_method.log
+        sleep 10
+done 2>&1 | tee middleware_insert_test_original_method_pt3.log

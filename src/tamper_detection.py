@@ -79,12 +79,8 @@ def rerc(table, table_name, key, iv):
 	tamper_flag = 0  # zero indicates no tampering
 	tampered_records_primary_key_list = []
 
-	#TODO: note - I already have these
-	#query = "select * from " + table_name  # construct the query for getting the data from the table
-	#results = adapter.send_query(query)
-
 	for index, row in table.iterrows():
-		rer = RowEncryptionRecord()
+		#rer = RowEncryptionRecord()
 		item_id = str(row["student_id"])
 		item_id_hash = item_id  #utils.get_item_id_hash(item_id)
 		#rer.item_hash = utils.get_item_hash_pk_present(row)
@@ -94,7 +90,7 @@ def rerc(table, table_name, key, iv):
 		owned_table_AES = utils.get_encrypted_table(table_name, settings["aes_key"], settings["iv"])
 
 		try:
-			blockchain_result = check_output(['node', 'query.js', item_id_hash])
+			blockchain_result = check_output(['node', 'query.js', 'RECORD' + item_id_hash])
 		except:
 			#print("CAUGHT EXCEPTION")
 			blockchain_result = ""  # no result for the query found above
