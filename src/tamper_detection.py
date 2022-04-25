@@ -1,6 +1,6 @@
 """
 Tamper Detection Module
-These algorithms are implemented with the guidance of the following study:
+These algorithms are have been modified with the guidance of the following study:
 https://ieeexplore-ieee-org.ezproxy.cul.columbia.edu/document/9417201
 
 J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," 
@@ -17,9 +17,12 @@ import hashlib
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord
 from MysqlAdapter import MysqlAdapter
-
-
 from subprocess import check_output
+import config
+
+
+# settings holds the AES encrypt and decrypt key
+settings = config.load_config()
 
 
 def rerc_new(row_encryption_recs, table_name, key, iv):
@@ -70,7 +73,7 @@ def cerc(col_encryption_rec, table_name, key, iv):
 
 
 # row encryption record comparison
-def rerc(results, table_name, adapter, key, iv):
+def rerc(table, table_name, key, iv):
 	""" """
 
 	tamper_flag = 0  # zero indicates no tampering
@@ -79,14 +82,16 @@ def rerc(results, table_name, adapter, key, iv):
 	#TODO: note - I already have these
 	#query = "select * from " + table_name  # construct the query for getting the data from the table
 	#results = adapter.send_query(query)
-	
-	for row in results:
-		item_id = row[0]
-		item_id_hash = utils.get_item_id_hash(item_id)
-		item_hash = utils.get_item_hash_pk_present(row)
-		# item_id_aes = utils.get_encrypted_item_id(item_id, key, iv)
-		item_id_aes = item_id
-		owned_table_aes = utils.get_encrypted_table(table_name, key, iv)
+
+	for index, row in table.iterrows():
+		rer = RowEncryptionRecord()
+		item_id = str(row["student_id"])
+		item_id_hash = item_id  #utils.get_item_id_hash(item_id)
+		#rer.item_hash = utils.get_item_hash_pk_present(row)
+		concatentated_items = "".join(map(str,row[1:]))  # concatenate the primary keys (for hash)
+		item_hash = utils.SHA_256_conversion(concatentated_items)  # hash the items in the row
+		item_id_AES = item_id
+		owned_table_AES = utils.get_encrypted_table(table_name, settings["aes_key"], settings["iv"])
 
 		try:
 			blockchain_result = check_output(['node', 'query.js', item_id_hash])

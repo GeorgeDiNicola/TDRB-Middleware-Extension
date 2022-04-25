@@ -259,14 +259,14 @@ if __name__ == '__main__':
 	# get the column encryption records and row encryption records for the database table
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(sql_data, table_name)
 	
-	row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
+	#row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
 
 
 	# detect illegal insert or delete step
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv)
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:
@@ -286,7 +286,7 @@ if __name__ == '__main__':
 		primary_keys.append(new_pk)
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = insert(user_query, sql_connection, row_to_insert, table_name, key, iv, primary_keys)
-	elif user_command == "delete" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0::
+	elif user_command == "delete" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 		primary_keys = list(sql_data['student_id'])  # get the primary keys
 		pk_to_delete = pks_to_delete[0]
 		primary_keys.remove(int(pk_to_delete))

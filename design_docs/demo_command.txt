@@ -75,3 +75,7 @@ python3 main.py --q "select * from student" --c "query"
 
 
 
+
+mysql -u(root) -p(root) (students) -e "select * from student;"
+
+
