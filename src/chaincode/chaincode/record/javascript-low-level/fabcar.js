@@ -56,7 +56,7 @@ let Chaincode = class {
     console.info('============= START : Initialize Ledger ===========');
     let records = [];
     records.push({
-      itemIdHash: 'test',
+      itemIdHash: 'RECORD0',
       itemIdAES: '0',
       itemHash: 'test',
       ownedTableAES: 'test'
@@ -84,15 +84,14 @@ let Chaincode = class {
       ownedTableAES: args[3]
     };
 
-    await stub.putState(record.itemIdHash, Buffer.from(JSON.stringify(record)));
+    await stub.putState('i' + record.itemIdHash, Buffer.from(JSON.stringify(record)));
     console.info('============= END : Create Record ===========');
   }
 
-  /*
-  async queryAllCars(stub, args) {
+  async queryAllRecords(stub, args) {
 
-    let startKey = 'CAR0';
-    let endKey = 'CAR999';
+    let startKey = 'RECORD0';
+    let endKey = 'RECORD999';
 
     let iterator = await stub.getStateByRange(startKey, endKey);
 
@@ -121,7 +120,6 @@ let Chaincode = class {
       }
     }
   }
-  */
 
   async updateRecord(stub, args) {
     console.info('============= START : updateRecord ===========');

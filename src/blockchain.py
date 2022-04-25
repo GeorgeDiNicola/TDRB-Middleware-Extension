@@ -5,7 +5,7 @@ def query_blockchain(queryId):
 	
 	blockchain_result = ""
 	try:
-		blockchain_result = check_output(['node', 'query.js', queryId.encode()])
+		blockchain_result = check_output(['node', 'query.js', queryId])
 	except:
 		print("ERROR: blockchain query failed")
 
