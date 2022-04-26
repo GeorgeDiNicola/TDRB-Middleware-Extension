@@ -73,23 +73,32 @@ def handle_user_args():
 def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated_item_value):
 	
 	# send the user's UPDATE sql command to the DB to see if it is valid
-	#result = sql_connection.execute(user_query)
+	result = sql_connection.execute(user_query)
 
 	# get the new item hash
 	update_col_name = 'name'
-	print(existing_item_id_hash)
-	condition = sql_table['student_id'] == str(existing_item_id_hash)
-	sql_table.loc[condition,'student_id'] = updated_item_value
-	print(updated_item_value)
 	
+	# update the pandas dataframe
+
+	# row #, col #
+	#sql_table.iat[0, 1]=updated_item_value
+	row = sql_table.loc[sql_table['student_id'] == int(existing_item_id_hash)]
+	print("Row being updated: ", row)
+	row[update_col_name] = updated_item_value
+	items = row.values.tolist()
+
 	#sql_table[update_col_name][str(existing_item_id_hash)] = updated_item_value
-	print(sql_table)
+	#print(sql_table)
+
+	#row = sql_table.iat[0,0:7]
+	#items = list(row)
 
 	# get the new row
 	#items = sql_table[sql_table.loc[sql_table.student_id == str(existing_item_id_hash)]]
 	#items = list(sql_table.iloc[])
-	items = sql_table.loc[sql_table['student_id'] == existing_item_id_hash]
-	print(items)
+	#items = sql_table.loc[sql_table['student_id'] == existing_item_id_hash]
+	items = items[0]
+	print("New row values: ", items)
 	concatentated_items = "".join(map(str,items[1:]))  # concatenate the primary keys (for hash)
 
 	new_item_hash = utils.SHA_256_conversion(concatentated_items)
@@ -99,13 +108,13 @@ def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated
 	#	print("Please reformulate SQL query!")
 	#	return False
 	
-	#blockchain_commit_success = blockchain.update_blockchain_record(existing_item_id_hash, new_item_hash)
+	blockchain_commit_success = blockchain.update_blockchain_record(existing_item_id_hash, new_item_hash)
 
 	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
-	#if blockchain_commit_success:
+	if blockchain_commit_success:
 		# commit the results to the MySQL DB if both user query is valid
 		#	and the blockchain insert was successful
-	#	print("Update statement successfully executed")
+		print("Update statement successfully executed")
 	# TODO: add else to return False
 
 	return True
@@ -278,14 +287,14 @@ if __name__ == '__main__':
 	# get the column encryption records and row encryption records for the database table
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(sql_data, table_name)
 	
-	row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
+	#row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
 
 
 	# detect illegal insert or delete step
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv)
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:
