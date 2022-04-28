@@ -13,18 +13,16 @@ COMSE6156 - Topics in Software Engineering - Final Project
   - George DiNicola, gd2581
 
 
-PART B:
-
 - List of files submitted:
 	--   | -- 			| -- 			| Description
 	--   | -- 			| -- 			| --
-	` ` | `README.md` 		| -			| (NOT INCLUDED IN COMPRESSED)
-  ` ` | `example-run.txt` 		| -			| The output of the compelling sample run of point 3f (NOT INCLUDED IN COMPRESSED)
-	` ` | `INTEGRATED-DATASET.csv` 		| -			| The integrated dataset for the project (NOT INCLUDED IN COMPRESSED)
+	` ` | `README.md` 		| -			| 
+  ` ` | `` 		| -			| 
+	` ` | ` 		| -			| 
 	`./proj3` | `run.sh` 	| -			| Bash script to run the project with instead of Python
-	`./proj3` | `src/` 			| `apriori_implementation.py`         	| Implementation of the apriori algorithm described in Section 2.1 of the Agrawal and Srikant paper in VLDB 1994 
-	`./proj3` | `src/` 			| `associations.py`       	| Functions for generating associations of the form {LHS} => {RHS} from the INTEGRATED-DATASET.csv file and calculating the confidence of associations.
-  `./proj3` | `src/` 			| `main.py`       	| Main execution of the application
+	`./` | `src/` 			| `.py`         	|
+	`./` | `src/` 			| `.py`       	| 
+  `./` | `src/` 			| `main.py`       	| Main execution of the application
   
   
 PART C:
