@@ -51,24 +51,29 @@ Python Code
 - `main.py`
 	- `()` - 
 	- `()` -
-- `ColumnEncryptionRecord.py` 
+- `ColumnEncryptionRecord.py` - The ColumnEncryptionRecord class is an implementation of the Column Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the table name, 2. the name of the table encrypted using AES, and the hash value of all of the primary keys in the table.
+  - Reference: This data structure/object was proposed in the following study: J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
+  - `get_unencrypted_table_name()` - returns the decrypted value of the table name attribute for the column encryption record object.
 - `RowEncryptionRecord.py` 
-- `blockchain.py` 
-  - `query_blockchain()` -
-  - `create_blockchain_record()` -
-  - `update_blockchain_record()` -
-  - `update_blockchain_record()` -
-- `config.py` 
-  - `update_blockchain_record()` -
+- `blockchain.py` - The blockchain module serves as an API to the blockchain ledger. It calls Nodejs scripts that execute CRUD operations on the ledger and world state database (CouchDB).
+  - `query_blockchain()` - Queries the state database using the key/ID.
+  - `create_blockchain_record()` - Creates a new blockchain record with the following attributes: 1. Item ID hash value, 2. Item ID encrypted using AES, 3. The hash value of all the items in the row, and 4. The name of the table encrypted using AES.
+  - `update_blockchain_record()` - Updates the item hash value of an existing record on the state database. This is used when any of the attribute/column values change for a given row in the relational database table.
+  - `delete_blockchain_record()` - Deletes an existing record in the state database.
+- `config.py` - The configuration module is meant for a user to configure the application to their relational database, their relational database credentials, and encryption (AES) key.
+  - load_config() - Loads the configured environment variables for the application.
 - `seed_blockchain.py` 
-- `setup.py` 
-  - `convert_table_to_column_encryption_record()` - 
-  - `convert_table_to_column_encryption_record()` -
+- `setup.py` - The setup module converts relational database table records to blockchain records represented using the data structures proposed in the TDRB research.
+  - `convert_table_to_column_encryption_record()` - Converts a relational table to the column encryption record proposed in TDRB.
+  - `convert_table_to_column_encryption_record()` - Converts a relational table to the record encryption records proposed in TDRB.
 - `sql.py` 
-- `tamper_detection.py` 
-  - `cerc()` - 
-  - `rerc()` - 
-  - `rerc_new()` - 
+- `tamper_detection.py` - The tamper_detection module checks for the existence of row encryption record and column encryption record representations
+  of the relational database on the blockchain. If the records do not match, the tampering to the relational database (as well as any
+  tampering to the blockchain) will be detected.
+    - `cerc()` - Algorithm proposed in the TDRB middleware study. Query the blockchain for the column encryption records for the relational table. If the column hash does not match the blockchain column hash, an illegal insert or delete will be detected.
+    - `rerc()` - Algorithm proposed in the TDRB middleware study. Query the blockchain for the row encryption records for the relational table. If the column hash does not match the blockchain column hash, an illegal modification is detected.
+    - `rerc_new()` - My own updated version of the row encryption record detection algorithm proposed in the TDRB study. This function calls the queryByRange blockchain API (a one-time bulk query) call to use its records to check for the existence of row encryption records.
+    - Reference: This data structure/object was proposed in the following study: J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
 - `utils.py`
 	- `get_column_hash()` -
 	- `get_column_hash_pks_only()` - 
@@ -94,6 +99,8 @@ Node code:
 Other Details:
 - Libraries I used (all of them are built into python and do not have to be installed with `pip`): 
   - `argparse`: A library that makes it easy for processing input from a user to a Python program. I used the argparse library to parse input from the user and have a much cleaner way for specifying parameters by name for the bash script (`run.sh`) executed by the user.
+  - `Cryptodome` - A library for AES encryption/decryption functions. Some attributes of the column encryption records and row encryption records are encrypted using AES.
+  - `hashlib` - A library for hashing values. Some attributes of the column encryption records and row encryption records are hashed.
   
   
    

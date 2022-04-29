@@ -1,3 +1,11 @@
+"""
+	Author: George DiNicola
+	Description: The configuration module is meant for a user to configure the
+	  application to their relational database, their relational database
+	  credentials, and encryption (AES) key.
+	.
+"""
+
 import os
 
 config = {
@@ -11,4 +19,5 @@ config = {
 }
 
 def load_config():
+	""" Load the configured environment variables for the application."""
 	return config

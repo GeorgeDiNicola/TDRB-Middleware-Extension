@@ -5,6 +5,10 @@ https://ieeexplore-ieee-org.ezproxy.cul.columbia.edu/document/9417201
 
 J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," 
 in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
+
+Description: The tamper_detection module checks for the existence of row encryption record and column encryption record representations
+  of the relational database on the blockchain. If the records do not match, the tampering to the relational database (as well as any
+  tampering to the blockchain) will be detected.
 """
 
 # AES encryption/decryption functions
@@ -26,6 +30,11 @@ settings = config.load_config()
 
 
 def rerc_new(row_encryption_recs, table_name, key, iv):
+	""" My own updated version of the row encryption record 
+		detection algorithm proposed in the TDRB study. This function
+		calls the queryByRange blockchain API (a one-time bulk query)
+		call to use its records to check for the existence of row 
+		encryption records."""
 
 	tamper_flag = 0  # zero indicates no tampering
 	tampered_records_primary_key_list = []
@@ -52,13 +61,13 @@ def rerc_new(row_encryption_recs, table_name, key, iv):
 
 # column encryption record comparison
 def cerc(col_encryption_rec, table_name, key, iv):
-	""" Get all DB tables involved in the original query statement and
-	query all the data in each table. Calculate the column encryption
-	record according to the TDRB middleware study. """
+	""" Algorithm proposed in the TDRB middleware study. Query the blockchain for 
+		the column encryption records for the relational table. If the column
+		hash does not match the blockchain column hash, an illegal insert 
+		or delete will be detected. """
 	
 	tamper_flag = 0  # zero indicates no tampering
 	tamper_info = ""
-
 
 	try:
 		blockchain_result = check_output(['node', 'query.js', 'RECORD0'])  # CERC always record 0
@@ -74,7 +83,10 @@ def cerc(col_encryption_rec, table_name, key, iv):
 
 # row encryption record comparison
 def rerc(table, table_name, key, iv):
-	""" """
+	""" Algorithm proposed in the TDRB middleware study. Query the blockchain for
+		the row encryption records for the relational table. If the column hash 
+		does not match the blockchain column hash, an illegal modification is
+		detected. """
 
 	tamper_flag = 0  # zero indicates no tampering
 	tampered_records_primary_key_list = []
