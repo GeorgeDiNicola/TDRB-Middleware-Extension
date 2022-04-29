@@ -62,7 +62,7 @@ Python Code
   - `delete_blockchain_record()` - Deletes an existing record in the state database.
 - `config.py` - The configuration module is meant for a user to configure the application to their relational database, their relational database credentials, and encryption (AES) key.
   - load_config() - Loads the configured environment variables for the application.
-- `seed_blockchain.py` 
+- `seed_blockchain.py` - The seed_blockchain module queries a relational table for all of the existing records and creates corresponding blockchain records for them on the Hyperledger Fabric network. 
 - `setup.py` - The setup module converts relational database table records to blockchain records represented using the data structures proposed in the TDRB research.
   - `convert_table_to_column_encryption_record()` - Converts a relational table to the column encryption record proposed in TDRB.
   - `convert_table_to_column_encryption_record()` - Converts a relational table to the record encryption records proposed in TDRB.
@@ -74,17 +74,17 @@ Python Code
     - `rerc()` - Algorithm proposed in the TDRB middleware study. Query the blockchain for the row encryption records for the relational table. If the column hash does not match the blockchain column hash, an illegal modification is detected.
     - `rerc_new()` - My own updated version of the row encryption record detection algorithm proposed in the TDRB study. This function calls the queryByRange blockchain API (a one-time bulk query) call to use its records to check for the existence of row encryption records.
     - Reference: This data structure/object was proposed in the following study: J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
-- `utils.py`
-	- `get_column_hash()` -
-	- `get_column_hash_pks_only()` - 
-  - `SHA_256_conversion()` - 
-  - `get_encrypted_table()` - 
-  - `get_table_name_hash()` - 
-  - `get_item_id_hash()` -
-  - `get_item_hash_pk_present()` - 
-  - `get_encrypted_item_id()` -  
-  - `encode_items()` -
-  - `get_all_database_tables()` -
+- `utils.py` - The utils module is a collection of useful functions that are used throughout the application.
+	- `get_column_hash()` - Gets the hash value for all of the primary keys in a database table. NOTE: assumes the primary key is the first column in the table!
+	- `get_column_hash_pks_only()` - Gets the hash value for all of the primary keys in a list.
+  - `SHA_256_conversion()` - Converts a variable of any data type to its corresponding SHA 256 hash value.
+  - `get_encrypted_table()` - Encrypts the name of a relational database table using AES encryption.
+  - `get_table_name_hash()` - Calculates the SHA 256 hash value for a given relational table name.
+  - `get_item_id_hash()` - Calculates the SHA 256 hash value for a given item ID.
+  - `get_item_hash_pk_present()` - Calculates the SHA 256 hash value for the contenated attribute value of the given row (EXCEPT the primary key). 
+  - `get_encrypted_item_id()` - Encrypts an item ID value using AES encryption.
+  - `encode_items()` - Convert a list of items to the UTF-8 encoding of their concatenated result.
+  - `get_all_database_tables()` - Queries the MySQL database for the names of all of the database tables and returns them as a list.
 
 Node code:
 - `delete.js`

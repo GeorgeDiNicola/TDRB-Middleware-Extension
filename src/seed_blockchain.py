@@ -1,3 +1,10 @@
+"""
+	Author: George DiNicola
+	Description: The seed_blockchain module queries a relational table for
+		all of the existing records and creates corresponding blockchain
+		records for them on the Hyperledger Fabric network.
+"""
+
 import mysql.connector
 from mysql.connector import Error
 
