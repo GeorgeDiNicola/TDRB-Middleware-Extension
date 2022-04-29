@@ -71,6 +71,7 @@ def handle_user_args():
 # do LAST. this one might be the hardest one since a second query would be needed to get
 #  the plaintext records to hash with the upated record
 def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated_item_value):
+	""" Make a valid update to both the relational database and blockchain."""
 	
 	# send the user's UPDATE sql command to the DB to see if it is valid
 	result = sql_connection.execute(user_query)
@@ -122,6 +123,7 @@ def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated
 
 
 def delete(user_query, sql_connection, item_id, updated_primary_key_list):
+	""" Send a valid delete to both the relational database and blockchain."""
 	
 	# send the user's DELETE sql command to the DB to see if it is valid
 	result = sql_connection.execute(user_query)
@@ -152,6 +154,7 @@ def delete(user_query, sql_connection, item_id, updated_primary_key_list):
 
 
 def insert(user_query, sql_connection, new_row, table_name, key, iv, pks_for_new_row):
+	""" Send a valid insert/create to both the relational database and blockchain."""
 	# NOTE: user MUST specify a primary key!!!!
 	
 	# send the user's insert sql command to the DB to see if it is valid
@@ -199,10 +202,10 @@ def insert(user_query, sql_connection, new_row, table_name, key, iv, pks_for_new
 
 
 def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag):
+	""" Send a query to the relational database and mark the tampered rows by
+		setting the tamper_column equal to 1."""
 
 	# send the user's query to the DB and read in the results as a pandas DF
-
-	# TODO: replace the adapter connection with pymysql
 	df = pd.read_sql_query(user_query, sql_connection)
 	df["tamper_column"] = 0  # set the detect column to false
 
@@ -224,14 +227,7 @@ def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, c
 	elif rerc_tamper_flag == 1:
 		print("The records below contain an illegal modification and are marked in the tamper_column\n")
 
-
-
-	
-	# print the results
-	print(df)
-
-	#print("tampered columns:")
-	#print(df.loc[df.tamper_column == 1])
+	print(df)  # display the results to the user
 
 	return True
 
@@ -257,37 +253,28 @@ if __name__ == '__main__':
 
 	
 	table_name = "student"
-	#table_list = ["student"]
 	database = settings["database"]
 	username = settings["username"]
 	host_name = settings["host_name"]
 	p = settings["password"]
 
-
-	
 	# query SQL for the table to check for tampering
 
 	# SQLAlchemy connection
 	connect_string = 'mysql+pymysql://{}:{}@{}/{}'.format(username, p, host_name, database)
 	sql_connection = create_engine(connect_string).connect()
 
-	# read in SQL table using student ID as the index (in-memory index)
-	#	 index_col='student_id', chunksize=2000
 	sql_data = pd.read_sql_table(table_name=table_name, con=sql_connection)
 
-
-	# cryptography operations
-
+	# cryptography settings
 	key = settings["aes_key"]
 	iv =  settings["iv"]
 	#iv = get_random_bytes(16)
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 
-
 	# get the column encryption records and row encryption records for the database table
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(sql_data, table_name)
-	
-	#row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
+	row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
 
 
 	# detect illegal insert or delete step
@@ -295,6 +282,7 @@ if __name__ == '__main__':
 
 	# detect illegal modification step
 	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
+
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:

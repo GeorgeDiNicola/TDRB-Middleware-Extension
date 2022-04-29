@@ -49,8 +49,11 @@ Functional overview of the internal design (function descriptions):
 
 Python Code
 - `main.py`
-	- `()` - 
-	- `()` -
+	- `handle_user_args()` - Handles the input given by the user. 
+	- `update()` - Sends a valid update to both the relational database and blockchain.
+  - `delete()` - Sends a valid delete to both the relational database and blockchain.
+  - `insert()` - Sends a valid insert/create to both the relational database and blockchain.
+  - `query()` - Sends a query to the relational database and marks the tampered rows by setting the tamper_column equal to 1.
 - `ColumnEncryptionRecord.py` - The ColumnEncryptionRecord class is an implementation of the Column Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the table name, 2. the name of the table encrypted using AES, and the hash value of all of the primary keys in the table.
   - Reference: This data structure/object was proposed in the following study: J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
   - `get_unencrypted_table_name()` - returns the decrypted value of the table name attribute for the column encryption record object.
