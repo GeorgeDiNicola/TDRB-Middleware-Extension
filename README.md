@@ -101,14 +101,16 @@ Python Code
   - `encode_items()` - Convert a list of items to the UTF-8 encoding of their concatenated result.
   - `get_all_database_tables()` - Queries the MySQL database for the names of all of the database tables and returns them as a list.
 
+
+The below node code came from the following example, which I modified for the purposes of the middleware app: https://hyperledger-fabric.readthedocs.io/en/release-1.4/write_first_app.html
 Node code:
-- `delete.js`
-- `enrollAdmin.js`
-- `invoke.js`
-- `query.js`
-- `queryRange.js`
-- `registerUser.js`
-- `update.js`
+- `delete.js` - deletes a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
+- `enrollAdmin.js` - (from the tutorial referenced above) creates an admin priviledged user.
+- `invoke.js` - creates/inserts a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
+- `query.js` - queries a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
+- `queryRange.js`- queries a range of records on the blockchain
+- `registerUser.js` - (from the tutorial referenced above) creates a new user called "user1" that can interact with the user. The crypto wallet for the user is added to the current working directory.s
+- `update.js` - updates a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
 
 
 Other Details:
