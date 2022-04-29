@@ -17,15 +17,30 @@ COMSE6156 - Topics in Software Engineering - Final Project
 	--   | -- 			| -- 			| Description
 	--   | -- 			| -- 			| --
 	` ` | `README.md` 		| -			| 
-  ` ` | `` 		| -			| 
+  ` ` | `requirements.txt` 		| -			| The required modules and module version numbers the Python application depends on.
 	` ` | ` 		| -			| 
-	`./proj3` | `run.sh` 	| -			| Bash script to run the project with instead of Python
-	`./` | `src/` 			| `.py`         	|
-	`./` | `src/` 			| `.py`       	| 
-  `./` | `src/` 			| `main.py`       	| Main execution of the application
+	`src/` | `` 	| -			| Bash script to run the project with instead of Python
+	`src/` | `main.py` 			| ``         	| Main execution of the application 
+	`src/` | `blockchain.py` 			| ``       	| The blockchain module serves as an API to the blockchain ledger. It calls Nodejs scripts that execute CRUD operations on the ledger and world state database (CouchDB).
+  `src/` | `ColumnEncrypionRecord.py`       | ``        | The ColumnEncryptionRecord class is an implementation of the Column Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the table name, 2. the name of the table encrypted using AES, and the hash value of all of the primary keys in the table.
+  `src/` | `config.py`      | ``        | The configuration module is meant for a user to configure the application to their relational database, their relational database credentials, and encryption (AES) key.
+  `src/` | `RowEncryptionRecord.py`      | ``        | The RowEncryptionRecord class is an implementation of the Row Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the item (row) ID, 2. the item ID (primary key) encrypted using AES, 3. the hash value of all of the row's attribute (column) values, and 4. the name of the table encrypted using AES.
+  `src/` | `seed_blockchain.py`      | ``        | The seed_blockchain module queries a relational table for all of the existing records and creates corresponding blockchain records for them on the Hyperledger Fabric network.
+  `src/` | `setup.py`      | ``        | The setup module converts relational database table records to blockchain records represented using the data structures proposed in the TDRB research.
+  `src/` | `tamper_detection.py`      | ``        | The tamper_detection module checks for the existence of row encryption record and column encryption record representations
+  of the relational database on the blockchain. If the records do not match, the tampering to the relational database (as well as any
+  tampering to the blockchain) will be detected.
+  `src/` | `test_delete.sh`      | ``        | Test script for committing a valid delete operation to the blockchain and relational database through the middleware app using the method I proposed queryByRange.
+  `src/` | `test_delete_original_method.sh`      | ``        | Test script for committing a valid delete operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `test_insert.sh`      | ``        | Test script for committing a valid insert operation to the blockchain and relational database through the middleware app using the method I proposed with queryByRange.
+  `src/` | `test_insert_original_method.sh`      | ``        | Test script for committing a valid insert operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `test_query.sh`      | ``        | Test script for querying the blockchain and relational database through the middleware app using the method I proposed queryByRange.
+  `src/` | `test_query_original_method.sh`      | ``        | Test script for querying blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `test_update.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method I proposed queryByRange.
+  `src/` | `test_update_original_method.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `utils.py`      | ``        | The utils module is a collection of useful functions that are used throughout the application.
   
-  
-PART C:
+
 
  - How to run program
   - Note: Assuming use of `python3` and Node v12.
@@ -42,13 +57,10 @@ PART C:
   
 
 
-Internal design: 
-
-
 Functional overview of the internal design (function descriptions):
 
 Python Code
-- `main.py`
+- `main.py` - Main execution of the application
 	- `handle_user_args()` - Handles the input given by the user. 
 	- `update()` - Sends a valid update to both the relational database and blockchain.
   - `delete()` - Sends a valid delete to both the relational database and blockchain.
@@ -57,7 +69,7 @@ Python Code
 - `ColumnEncryptionRecord.py` - The ColumnEncryptionRecord class is an implementation of the Column Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the table name, 2. the name of the table encrypted using AES, and the hash value of all of the primary keys in the table.
   - Reference: This data structure/object was proposed in the following study: J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
   - `get_unencrypted_table_name()` - returns the decrypted value of the table name attribute for the column encryption record object.
-- `RowEncryptionRecord.py` 
+- `RowEncryptionRecord.py` - The RowEncryptionRecord class is an implementation of the Row Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the item (row) ID, 2. the item ID (primary key) encrypted using AES, 3. the hash value of all of the row's attribute (column) values, and 4. the name of the table encrypted using AES.
 - `blockchain.py` - The blockchain module serves as an API to the blockchain ledger. It calls Nodejs scripts that execute CRUD operations on the ledger and world state database (CouchDB).
   - `query_blockchain()` - Queries the state database using the key/ID.
   - `create_blockchain_record()` - Creates a new blockchain record with the following attributes: 1. Item ID hash value, 2. Item ID encrypted using AES, 3. The hash value of all the items in the row, and 4. The name of the table encrypted using AES.
