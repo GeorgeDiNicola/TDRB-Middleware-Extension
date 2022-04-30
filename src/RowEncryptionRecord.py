@@ -11,7 +11,6 @@
 		 (column) values, and 4. the name of the table encrypted using AES.
 """
 
-
 # AES encryption/decryption functions
 from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes

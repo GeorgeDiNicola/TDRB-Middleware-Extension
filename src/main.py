@@ -212,8 +212,6 @@ def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, c
 		return False
 	
 	df["tamper_column"] = 0  # set the detect column to false		
-
-	# TODO: name all PRIMARY KEY columns to ID in mysql!
 	if len(tampered_primary_keys) > 0:
 		for pk in tampered_primary_keys:
 			df.loc[df.student_id == int(pk), "tamper_column"] = 1  # 1 indicates tampered
@@ -255,16 +253,13 @@ if __name__ == '__main__':
 		pks_to_delete = args.pk_to_delete
 		pks_to_delete = pks_to_delete.split(',')
 
-	
 	table_name = "student"
 	database = settings["database"]
 	username = settings["username"]
 	host_name = settings["host_name"]
 	p = settings["password"]
 
-	# query SQL for the table to check for tampering
-
-	# SQLAlchemy connection
+	# query SQL for the table to check for tampering (SQLAlchemy connection)
 	connect_string = 'mysql+pymysql://{}:{}@{}/{}'.format(username, p, host_name, database)
 	sql_connection = create_engine(connect_string).connect()
 
@@ -295,8 +290,8 @@ if __name__ == '__main__':
 
 	# move forward with the user's chosen operation
 	if user_command == "query":
-		#print(rerc_tampered_primary_keys)
 		res = query(user_query, sql_connection, rerc_tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag)
+	# TODO: minimize the logic within these statements
 	elif user_command == "insert" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 		primary_keys = list(sql_data['id'])  # get the primary keys
 		new_pk = primary_keys[-1] + 1
