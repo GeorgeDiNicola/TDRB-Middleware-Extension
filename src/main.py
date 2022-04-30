@@ -35,8 +35,6 @@ def handle_user_args():
 
 	parser.add_argument('--q', dest='query', required=True, type=str,
 		nargs='+', help='Query for the middleware to send to the relational database')
-	#parser.add_argument('--t', dest='table', required=True, type=str,
-	#	nargs='+', help='Table involved in the query')
 	parser.add_argument('--c', dest='command', required=True, type=str,
 		nargs='+', help='Command (insert, delete, update, query')
 	parser.add_argument('--r', dest='row_to_insert', required=False, type=str,
@@ -60,15 +58,12 @@ def handle_user_args():
 		args.row_to_insert = space.join(args.row_to_insert)
 	if args.update_template:
 		args.update_template = space.join(args.update_template)
-	# TOOD: change the pk_to_delete var name since I am collecting more of them
 	if args.pk_to_delete:
 		args.pk_to_delete = space.join(args.pk_to_delete)
 
 	return args
 
 
-# do LAST. this one might be the hardest one since a second query would be needed to get
-#  the plaintext records to hash with the upated record
 def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated_item_value):
 	""" Make a valid update to both the relational database and blockchain."""
 	
@@ -124,11 +119,11 @@ def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated
 def delete(user_query, sql_connection, item_id, updated_primary_key_list):
 	""" Send a valid delete to both the relational database and blockchain."""
 	
-	# send the user's DELETE sql command to the DB to see if it is valid
+	# send the user's DELETE sql command to the DB
 	result = sql_connection.execute(user_query)
 
 	# send to blockchain if the DB statement was valid and worked
-	if result:
+	if not result:
 		print("ERROR: Invalid SQL syntax")
 		return False
 	
@@ -143,11 +138,10 @@ def delete(user_query, sql_connection, item_id, updated_primary_key_list):
 
 	blockchain_cer_commit_success = blockchain.update_blockchain_record('0', new_column_hash)
 
-	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_rer_commit_success and blockchain_cer_commit_success:
-		# commit the results to the MySQL DB if both user query is valid and the blockchain insert was successful
 		print("Delete statement successfully executed")
-	# TODO: add else to return False
+	else:
+		return False
 
 	return True
 
@@ -156,28 +150,25 @@ def insert(user_query, sql_connection, new_row, table_name, key, iv, pks_for_new
 	""" Send a valid insert/create to both the relational database and blockchain."""
 	# NOTE: user MUST specify a primary key!!!!
 	
-	# send the user's insert sql command to the DB to see if it is valid
-	#result = adapter.send_query(user_query)
+	# send the user's insert sql command to the DB
 	result = sql_connection.execute(user_query)
 
 	# send to blockchain if the DB statement was valid and worked
-	# TODO: check what result value is supposed to be
-	if result:
+	if not result:
 		print("ERROR: Invalid SQL syntax")
 		return False
 	
-	
 	new_row_id = new_row[0]
 	new_itemID_hash = new_row_id  #utils.get_item_id_hash(new_row_id)
-	new_itemID_AES = utils.get_encrypted_item_id(new_row_id, key, iv)
-	#new_itemID_AES = new_row[0]
+	
+
+	# must do since encryption causes failure on id 128
+	new_itemID_AES = new_row_id
+	# new_itemID_AES = utils.get_encrypted_item_id(new_row_id, key, iv)
+
 	concatentated_items = "".join(map(str,new_row[1:]))  # concatenate the primary keys (for hash)
 	new_item_hash = utils.SHA_256_conversion(concatentated_items)
 	new_item_table_AES = utils.get_encrypted_table(table_name, key, iv)
-	#new_item_table_AES = table_name
-	#print(new_itemID_hash)
-	#print(new_itemID_AES)
-	#print(new_item_hash)
 
 	# create the new record on the blockchain
 	blockchain_rer_commit_success = blockchain.create_blockchain_record(new_itemID_hash, new_itemID_AES, new_item_hash, new_item_table_AES)
@@ -188,14 +179,10 @@ def insert(user_query, sql_connection, new_row, table_name, key, iv, pks_for_new
 
 	blockchain_cer_commit_success = blockchain.update_blockchain_record('0', new_column_hash)
 
-	# check if successful, if so, commit to the DB
-	
-	# TODO: FIX THIS!  the adapter.send_query(user_query) is committing to mysql before the actual commit
 	if blockchain_rer_commit_success and blockchain_cer_commit_success:
-		# commit the results to the MySQL DB if both user query is valid and the blockchain insert was successful
-		#adapter.connection.commit()
 		print("Insert statement successfully executed")
-	# TODO: add else to return False
+	else:
+		return False
 
 	return True
 
@@ -214,7 +201,7 @@ def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, c
 	df["tamper_column"] = 0  # set the detect column to false		
 	if len(tampered_primary_keys) > 0:
 		for pk in tampered_primary_keys:
-			df.loc[df.student_id == int(pk), "tamper_column"] = 1  # 1 indicates tampered
+			df.loc[df.id == int(pk), "tamper_column"] = 1  # 1 indicates tampered
 
 	if cerc_tamper_flag == 1 and rerc_tamper_flag == 1:
 		if len(df.loc[df.tamper_column == 1]) > 0:
@@ -241,6 +228,9 @@ if __name__ == '__main__':
 
 	user_query = args.query
 	user_command = args.command
+	
+
+
 	if args.row_to_insert:
 		row_to_insert = args.row_to_insert
 		row_to_insert = row_to_insert.split(',')
@@ -253,7 +243,11 @@ if __name__ == '__main__':
 		pks_to_delete = args.pk_to_delete
 		pks_to_delete = pks_to_delete.split(',')
 
+	
+	# TODO: how should I specify the name of the table????
 	table_name = "student"
+	
+
 	database = settings["database"]
 	username = settings["username"]
 	host_name = settings["host_name"]
@@ -267,8 +261,7 @@ if __name__ == '__main__':
 
 	# cryptography settings
 	key = settings["aes_key"]
-	iv =  settings["iv"]
-	#iv = get_random_bytes(16)
+	iv =  settings["iv"]  # iv = get_random_bytes(16)
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 
 	# get the column encryption records and row encryption records for the database table
@@ -291,10 +284,9 @@ if __name__ == '__main__':
 	# move forward with the user's chosen operation
 	if user_command == "query":
 		res = query(user_query, sql_connection, rerc_tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag)
-	# TODO: minimize the logic within these statements
 	elif user_command == "insert" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
 		primary_keys = list(sql_data['id'])  # get the primary keys
-		new_pk = primary_keys[-1] + 1
+		new_pk = row_to_insert[0]
 		primary_keys.append(new_pk)
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = insert(user_query, sql_connection, row_to_insert, table_name, key, iv, primary_keys)
