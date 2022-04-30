@@ -39,6 +39,17 @@ COMSE6156 - Topics in Software Engineering - Final Project
   `src/` | `test_update.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method I proposed queryByRange.
   `src/` | `test_update_original_method.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
   `src/` | `utils.py`      | ``        | The utils module is a collection of useful functions that are used throughout the application.
+
+  `src/` | `delete.js`      | ``        | deletes a record on the blockchain using the ID of its key value (the application uses its item ID hash value).
+  `src/` | `enrollAdmin.js`      | ``        | (from the FabCar tutorial referenced in this README) creates an admin priviledged user.
+  `src/` | `invoke.js`      | ``        | creates/inserts a record on the blockchain using the ID of its key value (the application uses its item ID hash value).
+  `src/` | `query.js`      | ``        | queries a record on the blockchain using the ID of its key value (the application uses its item ID hash value).
+  `src/` | `queryByRange.js`      | ``        | The utils module is a collection of useful functions that are used throughout the application.
+  `src/` | `registerUser.js`      | ``        | (from the FabCar tutorial referenced in this README) creates a new user called "user1" that can interact with the user. The crypto wallet for the user is added to the current working directory.s
+  `src/` | `update.js`      | ``        | updates a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
+
+  `src/` | `sql/`      | `create_student.sql`        | Database creation, table creation, and seeding script for the example data shown in the TDRB study.
+  `src/` | `sql/`      | `moon_comparison.sql`        | Database creation, table creation, and seeding script for the test data used in the MOON study.
   
 
 

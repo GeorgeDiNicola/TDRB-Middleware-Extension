@@ -20,7 +20,6 @@ import utils
 import hashlib
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord
-from MysqlAdapter import MysqlAdapter
 from subprocess import check_output
 import config
 

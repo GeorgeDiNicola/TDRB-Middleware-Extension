@@ -19,7 +19,6 @@ import utils
 import tamper_detection as td
 import sql as s
 import blockchain
-#from MysqlAdapter import MysqlAdapter
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord
 #import pymysql
@@ -77,13 +76,13 @@ def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated
 	result = sql_connection.execute(user_query)
 
 	# get the new item hash
-	update_col_name = 'glucose'
+	update_col_name = 'name'
 	
 	# update the pandas dataframe
 
 	# row #, col #
 	#sql_table.iat[0, 1]=updated_item_value
-	row = sql_table.loc[sql_table['id'] == int(existing_item_id_hash)]
+	row = sql_table.loc[sql_table['student_id'] == int(existing_item_id_hash)]
 	print("Row being updated: ", row)
 	row[update_col_name] = updated_item_value
 	items = row.values.tolist()
@@ -129,9 +128,9 @@ def delete(user_query, sql_connection, item_id, updated_primary_key_list):
 	result = sql_connection.execute(user_query)
 
 	# send to blockchain if the DB statement was valid and worked
-	#if result:
-	#	print("Please reformulate SQL query!")
-	#	return False
+	if result:
+		print("ERROR: Invalid SQL syntax")
+		return False
 	
 	item_id_hash_to_delete = item_id  # utils.get_item_id_hash(item_id)
 	
@@ -163,9 +162,9 @@ def insert(user_query, sql_connection, new_row, table_name, key, iv, pks_for_new
 
 	# send to blockchain if the DB statement was valid and worked
 	# TODO: check what result value is supposed to be
-	#if result:
-	#	print("Please reformulate SQL query!")
-	#	return False
+	if result:
+		print("ERROR: Invalid SQL syntax")
+		return False
 	
 	
 	new_row_id = new_row[0]
@@ -206,8 +205,13 @@ def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, c
 		setting the tamper_column equal to 1."""
 
 	# send the user's query to the DB and read in the results as a pandas DF
-	df = pd.read_sql_query(user_query, sql_connection)
-	#df["tamper_column"] = 0  # set the detect column to false
+	try:
+		df = pd.read_sql_query(user_query, sql_connection)
+	except:
+		print("ERROR: Invalid SQL syntax")
+		return False
+	
+	df["tamper_column"] = 0  # set the detect column to false		
 
 	# TODO: name all PRIMARY KEY columns to ID in mysql!
 	if len(tampered_primary_keys) > 0:
@@ -252,10 +256,8 @@ if __name__ == '__main__':
 		pks_to_delete = pks_to_delete.split(',')
 
 	
-	#table_name = "student"
-	table_name = "exam"
-	#database = settings["database"]
-	database = 'moon_comparison'
+	table_name = "student"
+	database = settings["database"]
 	username = settings["username"]
 	host_name = settings["host_name"]
 	p = settings["password"]
@@ -278,23 +280,18 @@ if __name__ == '__main__':
 	col_encryption_rec = setup.convert_table_to_column_encryption_record(sql_data, table_name)
 	row_encryption_recs = setup.convert_table_to_row_encryption_records(sql_data, table_name)
 
-
 	# detect illegal insert or delete step
-	#cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
+	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	#rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
-	rerc_tampered_primary_keys = []
-	rerc_tamper_flag = 0
-	cerc_tamper_flag = 0
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv)
 
 	# print the tampering info to the user before showing them the query results
-	#if rerc_tamper_flag == 1:
+	if rerc_tamper_flag == 1:
 		# return tamper information
-	#	print("TAMPERING DETECTED - ILLEGAL MODIFICATION: the data has been tampered with")
-	#if cerc_tamper_flag == 1:
-	#	print("TAMPERING DETECTED - ILLEGAL INSERT/DELETE: the data has been tampered with")
-
+		print("TAMPERING DETECTED - ILLEGAL MODIFICATION: the data has been tampered with")
+	if cerc_tamper_flag == 1:
+		print("TAMPERING DETECTED - ILLEGAL INSERT/DELETE: the data has been tampered with")
 
 	# move forward with the user's chosen operation
 	if user_command == "query":
