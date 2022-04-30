@@ -77,13 +77,13 @@ def update(user_query, sql_connection, sql_table, existing_item_id_hash, updated
 	result = sql_connection.execute(user_query)
 
 	# get the new item hash
-	update_col_name = 'name'
+	update_col_name = 'glucose'
 	
 	# update the pandas dataframe
 
 	# row #, col #
 	#sql_table.iat[0, 1]=updated_item_value
-	row = sql_table.loc[sql_table['student_id'] == int(existing_item_id_hash)]
+	row = sql_table.loc[sql_table['id'] == int(existing_item_id_hash)]
 	print("Row being updated: ", row)
 	row[update_col_name] = updated_item_value
 	items = row.values.tolist()
@@ -207,7 +207,7 @@ def query(user_query, sql_connection, tampered_primary_keys, rerc_tamper_flag, c
 
 	# send the user's query to the DB and read in the results as a pandas DF
 	df = pd.read_sql_query(user_query, sql_connection)
-	df["tamper_column"] = 0  # set the detect column to false
+	#df["tamper_column"] = 0  # set the detect column to false
 
 	# TODO: name all PRIMARY KEY columns to ID in mysql!
 	if len(tampered_primary_keys) > 0:
@@ -252,8 +252,10 @@ if __name__ == '__main__':
 		pks_to_delete = pks_to_delete.split(',')
 
 	
-	table_name = "student"
-	database = settings["database"]
+	#table_name = "student"
+	table_name = "exam"
+	#database = settings["database"]
+	database = 'moon_comparison'
 	username = settings["username"]
 	host_name = settings["host_name"]
 	p = settings["password"]
@@ -278,18 +280,20 @@ if __name__ == '__main__':
 
 
 	# detect illegal insert or delete step
-	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
+	#cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
-
+	#rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)
+	rerc_tampered_primary_keys = []
+	rerc_tamper_flag = 0
+	cerc_tamper_flag = 0
 
 	# print the tampering info to the user before showing them the query results
-	if rerc_tamper_flag == 1:
+	#if rerc_tamper_flag == 1:
 		# return tamper information
-		print("TAMPERING DETECTED - ILLEGAL MODIFICATION: the data has been tampered with")
-	if cerc_tamper_flag == 1:
-		print("TAMPERING DETECTED - ILLEGAL INSERT/DELETE: the data has been tampered with")
+	#	print("TAMPERING DETECTED - ILLEGAL MODIFICATION: the data has been tampered with")
+	#if cerc_tamper_flag == 1:
+	#	print("TAMPERING DETECTED - ILLEGAL INSERT/DELETE: the data has been tampered with")
 
 
 	# move forward with the user's chosen operation
@@ -297,13 +301,13 @@ if __name__ == '__main__':
 		#print(rerc_tampered_primary_keys)
 		res = query(user_query, sql_connection, rerc_tampered_primary_keys, rerc_tamper_flag, cerc_tamper_flag)
 	elif user_command == "insert" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
-		primary_keys = list(sql_data['student_id'])  # get the primary keys
+		primary_keys = list(sql_data['id'])  # get the primary keys
 		new_pk = primary_keys[-1] + 1
 		primary_keys.append(new_pk)
 		cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record
 		res = insert(user_query, sql_connection, row_to_insert, table_name, key, iv, primary_keys)
 	elif user_command == "delete" and rerc_tamper_flag == 0 and cerc_tamper_flag == 0:
-		primary_keys = list(sql_data['student_id'])  # get the primary keys
+		primary_keys = list(sql_data['id'])  # get the primary keys
 		pk_to_delete = pks_to_delete[0]
 		primary_keys.remove(int(pk_to_delete))
 		#cer_id = col_encryption_rec.table_name_hash  # need this to update the column encryption record

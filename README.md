@@ -48,6 +48,8 @@ COMSE6156 - Topics in Software Engineering - Final Project
   - Set up:
     - `pip3 install -r requirements.txt`  
     - `npm install`
+    - Enroll yourself as the admin user: `node enrollAdmin.js`
+    - Create a user called 'user1' `node registerUser.js`
   - Run: 
   	- `./run.sh`
   		- Example: 

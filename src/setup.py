@@ -29,7 +29,7 @@ def convert_table_to_column_encryption_record(table, table_name):
 	
 	cer = ColumnEncryptionRecord()
 
-	primary_keys = set(table['student_id'])  # get the primary keys
+	primary_keys = set(table['id'])  # get the primary keys
 
 	concatentated_primary_keys = "".join(map(str,primary_keys))  # concatenate the primary keys (for hash)
 	cer.column_hash = utils.SHA_256_conversion(concatentated_primary_keys)  # hash the concatenated primary keys
@@ -48,7 +48,7 @@ def convert_table_to_row_encryption_records(table, table_name):
 
 	for index, row in table.iterrows():
 		rer = RowEncryptionRecord()
-		item_id = str(row["student_id"])
+		item_id = str(row["id"])
 		rer.item_id_hash = item_id  #utils.get_item_id_hash(item_id)
 		#rer.item_hash = utils.get_item_hash_pk_present(row)
 		concatentated_items = "".join(map(str,row[1:]))  # concatenate the primary keys (for hash)
