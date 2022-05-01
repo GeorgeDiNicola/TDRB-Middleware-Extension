@@ -271,8 +271,8 @@ if __name__ == '__main__':
 	cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)
 
 	# detect illegal modification step
-	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)  # for the original method
-	#rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv) # for the modified method
+	#rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc(sql_data, table_name, key, iv)  # for the original method
+	rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv) # for the modified method
 
 	# print the tampering info to the user before showing them the query results
 	if rerc_tamper_flag == 1:
