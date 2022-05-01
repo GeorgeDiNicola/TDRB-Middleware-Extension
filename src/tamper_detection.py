@@ -87,7 +87,8 @@ def rerc(table, table_name, key, iv):
 	for index, row in table.iterrows():
 		#rer = RowEncryptionRecord()
 		item_id = str(row["id"])
-		item_id_hash = utils.get_item_id_hash(item_id)
+		item_id_hash = item_id
+		#item_id_hash = utils.get_item_id_hash(item_id)
 		concatentated_items = "".join(map(str,row[1:]))  # concatenate the primary keys (for hash)
 		item_hash = utils.SHA_256_conversion(concatentated_items)  # hash the items in the row
 		item_id_AES = item_id
