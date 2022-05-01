@@ -17,7 +17,6 @@ import setup
 import config
 import utils
 import tamper_detection as td
-import sql as s
 import blockchain
 from RowEncryptionRecord import RowEncryptionRecord
 from ColumnEncryptionRecord import ColumnEncryptionRecord

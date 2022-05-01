@@ -1,1 +1,0 @@
-SELECT_STUDENT_QUERY = "SELECT * FROM student"

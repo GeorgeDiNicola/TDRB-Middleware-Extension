@@ -50,7 +50,7 @@ COMSE6156 - Topics in Software Engineering - Final Project
 
   `src/` | `sql/`      | `create_student.sql`        | Database creation, table creation, and seeding script for the example data shown in the TDRB study.
   `src/` | `sql/`      | `moon_comparison.sql`        | Database creation, table creation, and seeding script for the test data used in the MOON study.
-  
+
 
 
  - How to run program
@@ -131,7 +131,10 @@ Other Details:
   - `argparse`: A library that makes it easy for processing input from a user to a Python program. I used the argparse library to parse input from the user and have a much cleaner way for specifying parameters by name for the bash script (`run.sh`) executed by the user.
   - `Cryptodome` - A library for AES encryption/decryption functions. Some attributes of the column encryption records and row encryption records are encrypted using AES.
   - `hashlib` - A library for hashing values. Some attributes of the column encryption records and row encryption records are hashed.
-  
+  - `base64` - a module for encoding ASCII characters into base 64 format.
+  - `os` - a default Python library for interacting with the operating system
+  - `pandas` - A library for converting a data source such as a SQL database, CSV file, Excel file, etc. to a table that can be operated on in Python.
+  - `subprocess` - A library for calling other processing in the operating system such as scripts in other programming languages and parallel tasks. 
   
    
 
