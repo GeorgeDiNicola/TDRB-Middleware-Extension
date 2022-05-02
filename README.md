@@ -158,8 +158,9 @@ Instructions for reproducing the tests I've conducted:
 - Research Question 2:
 	- Step 1: Follow the setup instructions listed at the beginning of the README.
 	- Step 2: Seed the MySQL database using the `moon_comparison.sql` seeding script (this script has the database creation, table creation, and table seeding scripted out already).
-	- Step 3: Seed the blockchain database (assuming step 1 is complete and the network is running) using the `python3 seed_blockchain.py` command. The script needs to be configured by changing the "table_name" variable's value (line 24) from `"student"` to `"exam"` and the database variable from `settings["database"]` to `moon_comparison`
-	- Step 4: (testing the new original implementation) Execute the test scripts (note: between each of the numbered tests, steps 1-3 need to be re-executed to re-create a clean test environment):
+	- Step 3: Seed the blockchain database (assuming step 1 is complete and the network is running) using the `python3 seed_blockchain.py` command. The script needs to be configured by changing the "table_name" variable's value (line 24) from `"student"` to `"exam"` and the database variable from `settings["database"]` to `moon_comparison` (line 28).
+	- Step 4: Change `main.py` to function similar to MOON by modifying out the following lines that contain the real-time tampering check: line 271 should change from `cerc_tamper_flag, cerc_info = td.cerc(col_encryption_rec, table_name, key, iv)` to `cerc_tamper_flag = 0` and line 2571 should change from `rerc_tamper_flag, rerc_tampered_primary_keys = td.rerc_new(row_encryption_recs, table_name, key, iv)` to `rerc_tamper_flag = 0 rerc_tampered_primary_keys = []`
+	- Step 5: (testing the new original implementation) Execute the test scripts (note: between each of the numbered tests, steps 1-3 need to be re-executed to re-create a clean test environment):
 		- 1) Execute the query test `./test_query_moon_comparison.sh`
 		- 2) Execute the insert test `./test_insert_moon_comparison.sh`
 		- 3) Execute the update test `./test_update_moon_comparison.sh`
