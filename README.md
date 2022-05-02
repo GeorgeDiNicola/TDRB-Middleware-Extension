@@ -18,8 +18,6 @@ COMSE6156 - Topics in Software Engineering - Final Project
 	--   | -- 			| -- 			| --
 	` ` | `README.md` 		| -			| 
   ` ` | `requirements.txt` 		| -			| The required modules and module version numbers the Python application depends on.
-	` ` | ` 		| -			| 
-	`src/` | `` 	| -			| Bash script to run the project with instead of Python
 	`src/` | `main.py` 			| ``         	| Main execution of the application 
 	`src/` | `blockchain.py` 			| ``       	| The blockchain module serves as an API to the blockchain ledger. It calls Nodejs scripts that execute CRUD operations on the ledger and world state database (CouchDB).
   `src/` | `ColumnEncrypionRecord.py`       | ``        | The ColumnEncryptionRecord class is an implementation of the Column Encryption Record data structure proposed in TDRB. The object has the following attributes: 1. The hash value of the table name, 2. the name of the table encrypted using AES, and the hash value of all of the primary keys in the table.
