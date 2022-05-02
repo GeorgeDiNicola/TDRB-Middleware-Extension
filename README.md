@@ -54,6 +54,7 @@ COMSE6156 - Topics in Software Engineering - Final Project
   `src/` | `milestone_assignments/`      | ``     | Directory containing the milestone assignments for COMSE6156 outlining the proposal and progress for this project.
    `src/` | `test_logs/`      | ``     | Directory containing the logs from the evaluation described in the final report.
    `src/` | `design_docs/`      | ``     | Directory containing useful commands for each of the tools used in the middleware application. Also contains thoughts, ideas, and notes while implementing the TDRB design
+   `src/` | `bin/`      | ``     | Directory containing the binary files for the Hyperledger Fabric blockchain (transaction generator, crypto generator, fabric server, orderer node instructions, peer node instruction)
 
 
 
