@@ -6,6 +6,8 @@ https://ieeexplore-ieee-org.ezproxy.cul.columbia.edu/document/9417201
 
 J. Lian, S. Wang and Y. Xie, "TDRB: An Efficient Tamper-Proof Detection Middleware for Relational Database Based on Blockchain Technology," in IEEE Access, vol. 9, pp. 66707-66722, 2021, doi: 10.1109/ACCESS.2021.3076235.
 
+Blockchain network tutorial and concepts: https://hyperledger-fabric.readthedocs.io/en/release-1.4/write_first_app.html
+
 
 COMSE6156 - Topics in Software Engineering - Final Project
 
@@ -17,6 +19,8 @@ COMSE6156 - Topics in Software Engineering - Final Project
 	--   | -- 			| -- 			| Description
 	--   | -- 			| -- 			| --
 	` ` | `README.md` 		| -			| 
+  ` ` | `startFabric.sh`     | -     | Script for initializing the blockchain network and ledger databases, as well as installing the chaincode onto each of the peers. This script is from the Hyperledger "Fabcar" tutorial referenced by the README.
+  ` ` | `stopFabric.sh`     | -     | Script for bringing down the blockchain network and cleaning up the execution environment. This script is from the Hyperledger "Fabcar" tutorial referenced by the README.
   `src/` | `requirements.txt` 		| -			| The required modules and module version numbers the Python application depends on.
 	`src/` | `main.py` 			| ``         	| Main execution of the application 
 	`src/` | `blockchain.py` 			| ``       	| The blockchain module serves as an API to the blockchain ledger. It calls Nodejs scripts that execute CRUD operations on the ledger and world state database (CouchDB).
