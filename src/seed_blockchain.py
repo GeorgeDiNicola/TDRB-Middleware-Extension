@@ -25,7 +25,6 @@ table_name = "student"
 
 # step 1: get the relational database configuration information
 settings = config.load_config()
-table_name = "student"
 database = settings["database"]
 username = settings["username"]
 host_name = settings["host_name"]
