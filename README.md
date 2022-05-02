@@ -48,6 +48,12 @@ COMSE6156 - Topics in Software Engineering - Final Project
 
   `src/` | `sql/`      | `create_student.sql`        | Database creation, table creation, and seeding script for the example data shown in the TDRB study.
   `src/` | `sql/`      | `moon_comparison.sql`        | Database creation, table creation, and seeding script for the test data used in the MOON study.
+  `src/` | `fabric/chaincode/record`      | `record.js`      | The javascript and javascript low-level chaincode deployed onto the peer nodes for the blockchain network. These scripts contain the business logic for the middleware application that each peer node should adhere to (i.e. handing of query, insert/create, update, delete operations). These scripts are modified from the originals found in the Hyperledger "Fabcar" tutorial referenced by the README.
+  `src/` | `fabric/config/`      | `configtx.yaml`, `core.yaml`, `orderer.yaml`     | Configuration files (.yaml format) for the blockchain network to run over Docker. These scripts are from the Hyperledger "Fabcar" tutorial referenced by the README.
+  `src/` | `fabric/first-network/`      | ``     | Scripts for the commands to start the blockchain network and install the necessary chaincode on the network peers for the "fist network" configuration from Hyperledger Fabric. These scripts are from the Hyperledger "Fabcar" tutorial referenced by the README.
+  `src/` | `fabric/basic-network/`      | ``     | Scripts for the commands to start the blockchain network and install the necessary chaincode on the network peers for the "basic network" configuration from Hyperledger Fabric. These scripts are from the Hyperledger "Fabcar" tutorial referenced by the README.
+  `src/` | `milestone_assignments/`      | ``     | Directory containing the milestone assignments for COMSE6156 outlining the proposal and progress for this project.
+   `src/` | `test_logs/`      | ``     | Directory containing the logs from the evaluation described in the final report.
 
 
 
@@ -133,7 +139,4 @@ Other Details:
   - `os` - a default Python library for interacting with the operating system
   - `pandas` - A library for converting a data source such as a SQL database, CSV file, Excel file, etc. to a table that can be operated on in Python.
   - `subprocess` - A library for calling other processing in the operating system such as scripts in other programming languages and parallel tasks. 
-  
-   
-
-
+ 
