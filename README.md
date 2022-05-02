@@ -55,7 +55,6 @@ COMSE6156 - Topics in Software Engineering - Final Project
 
  - How to run program
   - Note: Assuming use of `python3` and Node v12.
-  - Note: Both also assume you are running on a Google Cloud VM that was set up exactly following the given instructions (gc-setup.html)
   - Set up:
     - Install the required Python libraries/modules: `pip3 install -r requirements.txt`  
     - Install the required Node.js libraries/modules: `npm install`
