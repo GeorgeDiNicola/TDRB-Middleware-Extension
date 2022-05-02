@@ -44,12 +44,6 @@ create table exam(
    PRIMARY KEY ( id )
 );
 
-   FOREIGN KEY (id_doctor) REFERENCES doctor(id),
-   FOREIGN KEY (id_lab_worker) REFERENCES laboratory_worker(id),
-   FOREIGN KEY (id_patient) REFERENCES patient(id)
-);
-
-
 
 insert into exam (id, id_doctor, id_lab_worker, id_patient, date_exam, glucose, insulin, leptin, adiponecti, resistin, mcp_1) values (1, 16, 20, 93, '7/1/2021', 33.5, 25.4, 56.4, 10.8, 5.3, 0.4);
 insert into exam (id, id_doctor, id_lab_worker, id_patient, date_exam, glucose, insulin, leptin, adiponecti, resistin, mcp_1) values (2, 23, 16, 47, '5/19/2021', 12.9, 95.7, 93.5, 67.6, 95.5, 0.2);
