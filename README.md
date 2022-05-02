@@ -30,10 +30,13 @@ COMSE6156 - Topics in Software Engineering - Final Project
   `src/` | `test_delete_original_method.sh`      | ``        | Test script for committing a valid delete operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
   `src/` | `test_insert.sh`      | ``        | Test script for committing a valid insert operation to the blockchain and relational database through the middleware app using the method I proposed with queryByRange.
   `src/` | `test_insert_original_method.sh`      | ``        | Test script for committing a valid insert operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+   `src/` | `test_insert_moon_comparison.sh`      | ``        | Test script for committing a valid insert operation to the blockchain and relational database through the middleware app using the test data from MOON.
   `src/` | `test_query.sh`      | ``        | Test script for querying the blockchain and relational database through the middleware app using the method I proposed queryByRange.
   `src/` | `test_query_original_method.sh`      | ``        | Test script for querying blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `test_query_moon_comparison.sh`      | ``        | Test script for querying the blockchain and relational database through the middleware app using the test data from MOON.
   `src/` | `test_update.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method I proposed queryByRange.
   `src/` | `test_update_original_method.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the method proposed in the TDRB study.
+  `src/` | `test_update_moon_comparison.sh`      | ``        | Test script for committing a valid update operation to the blockchain and relational database through the middleware app using the test data from MOON.
   `src/` | `utils.py`      | ``        | The utils module is a collection of useful functions that are used throughout the application.
   `src/` | `delete.js`      | ``        | deletes a record on the blockchain using the ID of its key value (the application uses its item ID hash value).
   `src/` | `enrollAdmin.js`      | ``        | (from the FabCar tutorial referenced in this README) creates an admin priviledged user.
@@ -155,6 +158,11 @@ Instructions for reproducing the tests I've conducted:
 - Research Question 2:
 	- Step 1: Follow the setup instructions listed at the beginning of the README.
 	- Step 2: Seed the MySQL database using the `moon_comparison.sql` seeding script (this script has the database creation, table creation, and table seeding scripted out already).
+	- Step 3: Seed the blockchain database (assuming step 1 is complete and the network is running) using the `python3 seed_blockchain.py` command. The script needs to be configured by changing the "table_name" variable's value (line 24) from `"student"` to `"exam"` and the database variable from `settings["database"]` to `moon_comparison`
+	- Step 4: (testing the new original implementation) Execute the test scripts (note: between each of the numbered tests, steps 1-3 need to be re-executed to re-create a clean test environment):
+		- 1) Execute the query test `./test_query_moon_comparison.sh`
+		- 2) Execute the insert test `./test_insert_moon_comparison.sh`
+		- 3) Execute the update test `./test_update_moon_comparison.sh`
 
 Other Details:
 - Libraries I used (all of them are built into python and do not have to be installed with `pip`): 
