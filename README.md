@@ -138,7 +138,7 @@ Instructions for reproducing the tests I've conducted:
 
 - Research Question 1:
 	- Step 1: Follow the setup instructions listed at the beginning of the README.
-	- Step 2: Seed the MySQL database using the create_student.sql seeding script (this script has the database creation, table creation, and table seeding scripted out already).
+	- Step 2: Seed the MySQL database using the `create_student.sql` seeding script (this script has the database creation, table creation, and table seeding scripted out already).
 	- Step 3: Seed the blockchain database (assuming step 1 is complete and the network is running) using the `python3 seed_blockchain.py` command. The script does not need to be altered since it is already configured for the "students" test database and "student" test table.
 	- Step 4: (testing the new queryByRange implementation) Execute the test scripts (note: between each of the numbered tests, steps 1-3 need to be re-executed to re-create a clean test environment):
 		- 1) Execute the query test `./test_query.sh`
@@ -152,7 +152,8 @@ Instructions for reproducing the tests I've conducted:
 		- 4) Execute the update test `./test_update_original_method.sh`
 
 - Research Question 2:
-
+	- Step 1: Follow the setup instructions listed at the beginning of the README.
+	- Step 2: Seed the MySQL database using the `moon_comparison.sql` seeding script (this script has the database creation, table creation, and table seeding scripted out already).
 
 Other Details:
 - Libraries I used (all of them are built into python and do not have to be installed with `pip`): 
