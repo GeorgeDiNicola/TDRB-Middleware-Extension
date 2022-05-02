@@ -57,16 +57,25 @@ COMSE6156 - Topics in Software Engineering - Final Project
   - Note: Assuming use of `python3` and Node v12.
   - Note: Both also assume you are running on a Google Cloud VM that was set up exactly following the given instructions (gc-setup.html)
   - Set up:
-    - `pip3 install -r requirements.txt`  
-    - `npm install`
+    - Install the required Python libraries/modules: `pip3 install -r requirements.txt`  
+    - Install the required Node.js libraries/modules: `npm install`
+    - Start the blockchain network (this step will take about two minutes to execute): `./startFabric javascript`
     - Enroll yourself as the admin user: `node enrollAdmin.js`
     - Create a user called 'user1' `node registerUser.js`
+    - (if necessary) seed the blockchain using the configured relational database using the following command (specify the table from within the script): `python3 seed_blockchain.py"
   - Run: 
-  	- `./run.sh`
-  		- Example: 
+  	- Query records using the middleware: `python3 main.py --q "<SQL Query>" --c "query"`
+  		- Example: `python3 main.py --q "select * from student" --c "query"`
+	- Insert a record using the middleware: `python3 main.py --q "<SQL Insert statement>" --c "insert" --r "<row to insert separated by commas>"`
+  		- Example: `python3 main.py --q "insert into student (id, name, sex, age) values (1, 'John', 'Male', 20);" --c "insert" --r "1,John,Male,20"`
+  	- Update a record using the middleware: `python3 main.py --q "<SQL Update statement>" --c "update" --u "<primary key to update>, <new update value>"`
+  		- Example: `python3 main.py --q "update student set name='Alice' where id=1" --c "update" --u "1,Alice"`
+  	- Delete a record using the middleware: `python3 main.py --q "<SQL Delete statement>" --c "delete" --d <primary key of the record to delete>`
+  		- Example: `python3 main.py --q "delete from student where id=1" --c "delete" --d 1`
   - Troubleshooting:
   	- if the run.sh script complains about permissions, please use `chmod u+x run.sh` to grant the permission and try the "Run" step again
   	- if the blockchain refuses transactions to the peer1.organization1.com node, execute the `docker stop peer1.organization1.com` and execute the steps to recreate the wallet.
+  	- if the following error occurs "ERROR: Couldn't connect to Docker daemon at http+docker://localunixsocket - is it running?", change the permissions for the Docker network communication socket using the following command: `sudo chmod 666 /var/run/docker.sock`
   
 
 
@@ -124,6 +133,11 @@ Node code:
 - `queryRange.js`- queries a range of records on the blockchain
 - `registerUser.js` - (from the tutorial referenced above) creates a new user called "user1" that can interact with the user. The crypto wallet for the user is added to the current working directory.s
 - `update.js` - updates a record on the blockchain using the ID of its key value (the application uses its item ID hash value)
+
+
+Instructions for reproducing the tests I've conducted:
+	Step 1: Follow the setup instructions listed at the beginning of the README.
+	Step 2:
 
 
 Other Details:
