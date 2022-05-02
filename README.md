@@ -62,7 +62,7 @@ COMSE6156 - Topics in Software Engineering - Final Project
 
 
 
- - How to run program
+- How to run program
   - Note: Assuming use of `python3` and Node v12.
   - Set up:
     - Install the required Python libraries/modules: `pip3 install -r requirements.txt`  
